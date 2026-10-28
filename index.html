@@ -1072,10 +1072,130 @@ function renderMedia(page, container) {
 }
 
 // EDIT CHAPTERS
+let chapterChannel = null;
+let chapterLoadVersion = 0;
+let editorChapterId = null;
+
+function chapterFromRow(row) {
+  return {
+    id: row.id,
+    position: row.position,
+    type: row.type,
+    title: row.title,
+    text: row.text,
+    mediaType: row.media_type,
+    mediaUrl: row.media_url
+  };
+}
+
+async function loadOnlineChapters() {
+  const version = ++chapterLoadVersion;
+  const selectedId = pages[currentPage]?.id;
+
+  const { data, error } = await window.diaryDB
+    .from("diary_chapters")
+    .select("id,position,type,title,text,media_type,media_url")
+    .order("position", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    showToast("Loading failed: " + error.message);
+    return false;
+  }
+
+  if (version !== chapterLoadVersion) return true;
+
+  if (!data.length) {
+    showToast("No online chapters yet. Import them once.");
+    return false;
+  }
+
+  pages = data.map(chapterFromRow);
+
+  const selectedIndex = pages.findIndex(
+    p => p.id === selectedId
+  );
+
+  currentPage = selectedIndex >= 0
+    ? selectedIndex
+    : Math.min(currentPage, pages.length - 1);
+
+  renderPage();
+  return true;
+}
+
+function startChapterRealtime() {
+  if (chapterChannel) {
+    window.diaryDB.removeChannel(chapterChannel);
+  }
+
+  chapterChannel = window.diaryDB
+    .channel("our-book-chapters")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "diary_chapters"
+      },
+      () => loadOnlineChapters()
+    )
+    .subscribe();
+}
+
+// IMPORT EXISTING LOCAL CHAPTERS — ONLY ONCE
+
+async function importMyExistingChapters() {
+  const local = load(PAGE_KEY, defaultPages);
+
+  if (!confirm(
+    `Import ${local.length} chapters to our shared book?`
+  )) return;
+
+  const { count, error: countError } = await window.diaryDB
+    .from("diary_chapters")
+    .select("id", { count: "exact", head: true });
+
+  if (countError) {
+    showToast(countError.message);
+    return;
+  }
+
+  if (count !== 0) {
+    showToast("Online chapters already exist.");
+    return;
+  }
+
+  const rows = local.map((p, i) => ({
+    position: (i + 1) * 1000,
+    type: p.type,
+    title: p.title,
+    text: p.text || "",
+    media_type: p.mediaType || "none",
+    media_url: p.mediaUrl || ""
+  }));
+
+  const { error } = await window.diaryDB
+    .from("diary_chapters")
+    .insert(rows);
+
+  if (error) {
+    showToast("Import failed: " + error.message);
+    return;
+  }
+
+  await loadOnlineChapters();
+  showToast("Chapters imported successfully ❤️");
+}
+
+// EDIT CHAPTER
 
 $("editPage").onclick = () => {
   const page = pages[currentPage];
-  if (page.type === "diary") return;
+
+  if (!page?.id || page.type === "diary") return;
+
+  editorChapterId = page.id;
 
   $("chapterTitle").value = page.title;
   $("chapterText").value = page.text;
@@ -1085,92 +1205,153 @@ $("editPage").onclick = () => {
   modal("editorModal", true);
 };
 
-$("savePage").onclick = () => {
-  const page = pages[currentPage];
+// SAVE CHAPTER ONLINE
 
-  if (page.type === "diary") return;
+$("savePage").onclick = async () => {
+  if (!editorChapterId) return;
+
+  const page = pages.find(
+    p => p.id === editorChapterId
+  );
+
+  if (!page || page.type === "diary") return;
 
   const mediaType = $("mediaType").value;
   const mediaUrl = $("mediaUrl").value.trim();
 
-  if (mediaType !== "none" &&
-      mediaUrl && !safeUrl(mediaUrl)) {
+  if (
+    mediaType !== "none" &&
+    mediaUrl &&
+    !safeUrl(mediaUrl)
+  ) {
     showToast("Use HTTPS or an assets/ file path.");
     return;
   }
 
-  const updated = {
-    ...page,
-    title: $("chapterTitle").value.trim() ||
-      "Our Untitled Chapter",
-    text: $("chapterText").value,
-    mediaType,
-    mediaUrl
-  };
+  const button = $("savePage");
+  button.disabled = true;
 
-  const old = pages[currentPage];
-  pages[currentPage] = updated;
+  const { error } = await window.diaryDB
+    .from("diary_chapters")
+    .update({
+      title: $("chapterTitle").value.trim() ||
+        "Our Untitled Chapter",
+      text: $("chapterText").value,
+      media_type: mediaType,
+      media_url: mediaUrl
+    })
+    .eq("id", editorChapterId);
 
-  if (!save(PAGE_KEY, pages)) {
-    pages[currentPage] = old;
+  button.disabled = false;
+
+  if (error) {
+    showToast("Save failed: " + error.message);
     return;
   }
 
   modal("editorModal", false);
-  renderPage();
-  showToast("Chapter saved ❤️");
+  await loadOnlineChapters();
+
+  showToast("Chapter saved on both devices ❤️");
 };
 
-$("addPage").onclick = () => {
-  const diaryIndex = pages.findIndex(
-    page => page.type === "diary"
-  );
+// ADD NEW CHAPTER
 
-  const newPage = {
-    type: "story",
-    title: "Our New Chapter",
-    text: "",
-    mediaType: "none",
-    mediaUrl: ""
-  };
-
-  const insertAt =
-    diaryIndex >= 0 ? diaryIndex : pages.length;
-
-  pages.splice(insertAt, 0, newPage);
-
-  if (!save(PAGE_KEY, pages)) {
-    pages.splice(insertAt, 1);
+$("addPage").onclick = async () => {
+  if (!pages[0]?.id) {
+    showToast("Import your chapters first.");
     return;
   }
 
-  currentPage = insertAt;
+  const diary = pages.find(p => p.type === "diary");
+  const other = pages.filter(p => p.type !== "diary");
+
+  const position =
+    Math.max(0, ...other.map(p => p.position || 0)) + 1000;
+
+  const button = $("addPage");
+  button.disabled = true;
+
+  const { data, error } = await window.diaryDB
+    .from("diary_chapters")
+    .insert({
+      position,
+      type: "story",
+      title: "Our New Chapter",
+      text: "",
+      media_type: "none",
+      media_url: ""
+    })
+    .select("id")
+    .single();
+
+  if (!error && diary && diary.position <= position) {
+    const moved = await window.diaryDB
+      .from("diary_chapters")
+      .update({ position: position + 1000 })
+      .eq("id", diary.id);
+
+    if (moved.error) {
+      showToast("Chapter added, but diary order needs fixing.");
+    }
+  }
+
+  button.disabled = false;
+
+  if (error) {
+    showToast("Add failed: " + error.message);
+    return;
+  }
+
+  await loadOnlineChapters();
+
+  currentPage = pages.findIndex(p => p.id === data.id);
   renderPage("next");
-  showToast("New chapter added ✨");
+
+  showToast("New chapter shared ✨");
 };
 
-$("deletePage").onclick = () => {
-  const page = pages[currentPage];
+// DELETE CHAPTER
 
-  if (page.type === "opening" ||
-      page.type === "diary") {
+$("deletePage").onclick = async () => {
+  const page = pages.find(
+    p => p.id === editorChapterId
+  );
+
+  if (
+    !page ||
+    page.type === "opening" ||
+    page.type === "diary"
+  ) {
     showToast("This special page cannot be deleted.");
     return;
   }
 
-  if (!confirm("Delete this chapter permanently?")) return;
+  if (!confirm(
+    "Delete this chapter from BOTH devices permanently?"
+  )) return;
 
-  const removed = pages.splice(currentPage, 1)[0];
+  const button = $("deletePage");
+  button.disabled = true;
 
-  if (!save(PAGE_KEY, pages)) {
-    pages.splice(currentPage, 0, removed);
+  const { error } = await window.diaryDB
+    .from("diary_chapters")
+    .delete()
+    .eq("id", editorChapterId);
+
+  button.disabled = false;
+
+  if (error) {
+    showToast("Delete failed: " + error.message);
     return;
   }
 
-  currentPage = Math.min(currentPage, pages.length - 1);
+  editorChapterId = null;
+
   modal("editorModal", false);
-  renderPage();
-  showToast("Chapter deleted.");
+  await loadOnlineChapters();
+
+  showToast("Chapter deleted from both devices.");
 };
 
 // OUR TALK DIARIES
