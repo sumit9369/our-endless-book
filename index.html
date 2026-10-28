@@ -1264,7 +1264,7 @@ function renderMessages() {
     const card = el(
       "div",
       "diary-message" +
-      (message.author.startsWith("Piyaaa") ? " piyaaa" : "")
+      (message.userId === currentUser?.id ? " piyaaa" : "")
     );
 
     const author = el("strong", "", message.author);
