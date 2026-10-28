@@ -137,6 +137,18 @@
 
 <div id="toast" class="toast hidden" role="status"></div>
 
+  <!-- SUPABASE CONNECTION -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<script>
+const SUPABASE_URL = https://hwqccyftcaoqcmxmhdal.supabase.co/rest/v1/;
+const SUPABASE_KEY = sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf;
+
+const diaryDB = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+</script>
 </body>
 </html>
 <style>
