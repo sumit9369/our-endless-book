@@ -1673,6 +1673,8 @@ async function unlockBook(user) {
   }
 
   currentUser = user;
+  await loadOnlineChapters();
+  startChapterRealtime();
   $("loginScreen").classList.add("hidden");
   $("cover").classList.remove("hidden");
 }
