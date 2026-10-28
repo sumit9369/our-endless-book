@@ -1178,11 +1178,10 @@ $("deletePage").onclick = () => {
 
 // OUR TALK DIARIES
 
-$("goDiary").onclick = () => {
-  renderMessages();
+$("goDiary").onclick = async () => {
+  await loadOnlineMessages();
   modal("diaryModal", true);
 };
-
 $("sendDiary").onclick = async () => {
   const text = $("diaryText").value.trim();
 
