@@ -1013,11 +1013,10 @@ function renderPage(direction = "") {
     const open = el("button", "gold-btn full",
       "Open Our Talk Diaries 💌");
 
-    open.onclick = () => {
-      renderMessages();
-      modal("diaryModal", true);
-    };
-
+    open.onclick = async () => {
+  await loadOnlineMessages();
+  modal("diaryModal", true);
+};
     container.appendChild(open);
 
     container.appendChild(
