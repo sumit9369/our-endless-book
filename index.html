@@ -1183,8 +1183,7 @@ $("goDiary").onclick = () => {
   modal("diaryModal", true);
 };
 
-$("sendDiary").onclick = () => {
-  const author = $("diaryAuthor").value;
+$("sendDiary").onclick = async () => {
   const text = $("diaryText").value.trim();
 
   if (!text) {
@@ -1192,24 +1191,61 @@ $("sendDiary").onclick = () => {
     return;
   }
 
-  const message = {
-    id: crypto.randomUUID
-      ? crypto.randomUUID()
-      : `${Date.now()}-${Math.random()}`,
-    author,
-    text,
-    createdAt: new Date().toISOString()
-  };
+  const { data: { user }, error: authError } =
+    await window.diaryDB.auth.getUser();
 
-  messages.push(message);
+  if (authError || !user) {
+    showToast("Please log in again.");
+    return;
+  }
 
-  if (!save(DIARY_KEY, messages)) {
-    messages.pop();
+  const button = $("sendDiary");
+  button.disabled = true;
+
+  const { error } = await window.diaryDB
+    .from("diary_messages")
+    .insert({
+      user_id: user.id,
+      message: text
+    });
+
+  button.disabled = false;
+
+  if (error) {
+    console.error(error);
+    showToast("Save failed: " + error.message);
     return;
   }
 
   $("diaryText").value = "";
+  await loadOnlineMessages();
+  showToast("Message saved online ❤️");
+};
+
+async function loadOnlineMessages() {
+  const { data, error } = await window.diaryDB
+    .from("diary_messages")
+    .select("id,user_id,message,created_at")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    showToast("Loading failed: " + error.message);
+    return;
+  }
+
+  messages = (data || []).map(row => ({
+    id: row.id,
+    userId: row.user_id,
+    author: row.user_id === currentUser?.id
+      ? "Me ♡"
+      : "My Favourite Person ♡",
+    text: row.message,
+    createdAt: row.created_at
+  }));
+
   renderMessages();
+}  renderMessages();
   renderPage();
   showToast("Your message has been saved ❤️");
 };
