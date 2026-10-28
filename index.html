@@ -169,8 +169,6 @@ window.diaryDB = window.supabase.createClient(
 
 console.log("Supabase initialized!");
 </script>
-</body>
-</html>
 <style>
   #loginForm {
   width: 100%;
@@ -1243,10 +1241,7 @@ async function loadOnlineMessages() {
   }));
 
   renderMessages();
-}  renderMessages();
-  renderPage();
-  showToast("Your message has been saved ❤️");
-};
+}  
 
 function renderMessages() {
   const box = $("diaryMessages");
@@ -1537,6 +1532,11 @@ async function restoreSession() {
     } catch (err) {
       $("loginError").textContent = err.message;
     }
+
+
+    </body>
+</html>
+
   }
 }
 
