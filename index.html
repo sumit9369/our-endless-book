@@ -10,8 +10,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+<section id="loginScreen" class="cover-screen">
+  <div class="cover-book">
+    <div class="ornament">✦ ❦ ✦</div>
+    <p class="eyebrow">OUR PRIVATE LITTLE WORLD</p>
+    <h1>Only For Us ♡</h1>
+    <p class="names">Piyaaa ❤️‍🩹 & Babuchak 😃</p>
 
-<section id="cover" class="cover-screen">
+    <form id="loginForm">
+      <input id="loginEmail" type="email"
+        placeholder="Enter your email" required
+        autocomplete="username">
+
+      <input id="loginPassword" type="password"
+        placeholder="Enter your password" required
+        autocomplete="current-password">
+
+      <button type="submit" class="gold-btn full">
+        Unlock Our World ♡
+      </button>
+    </form>
+
+    <p id="loginError" role="alert"></p>
+  </div>
+</section>
+<section id="cover" class="cover-screen hidden">
   <div class="cover-book">
     <div class="ornament">✦ ❦ ✦</div>
     <p class="eyebrow">TWO HEARTS · ONE DIARY</p>
@@ -149,6 +172,27 @@ console.log("Supabase initialized!");
 </body>
 </html>
 <style>
+  #loginForm {
+  width: 100%;
+  max-width: 300px;
+  display: grid;
+  gap: 15px;
+  margin: 25px auto;
+}
+
+#loginForm input {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #c7a36a;
+  background: #fff8eb;
+  color: #35231d;
+  width: 100%;
+}
+
+#loginError {
+  color: #ffd0c8;
+  font-size: 13px;
+}
 :root {
   --brown: #35231d;
   --paper: #f8efd9;
@@ -1404,4 +1448,63 @@ document.addEventListener("keydown", event => {
 
 renderPage();
 updateMusicUI();
+  let currentUser = null;
+
+async function unlockBook(user) {
+  const { data, error } = await window.diaryDB
+    .from("diary_members")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error || !data) {
+    await window.diaryDB.auth.signOut();
+    throw new Error("This account is not approved.");
+  }
+
+  currentUser = user;
+  $("loginScreen").classList.add("hidden");
+  $("cover").classList.remove("hidden");
+}
+
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  $("loginError").textContent = "";
+
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value;
+
+  const { data, error } =
+    await window.diaryDB.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
+    $("loginError").textContent = error.message;
+    return;
+  }
+
+  try {
+    await unlockBook(data.user);
+    $("loginPassword").value = "";
+  } catch (err) {
+    $("loginError").textContent = err.message;
+  }
+});
+
+// Keep users logged in after refreshing
+async function restoreSession() {
+  const { data } = await window.diaryDB.auth.getUser();
+
+  if (data?.user) {
+    try {
+      await unlockBook(data.user);
+    } catch (err) {
+      $("loginError").textContent = err.message;
+    }
+  }
+}
+
+restoreSession();
 </script>
