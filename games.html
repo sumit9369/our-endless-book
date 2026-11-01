@@ -1,64 +1,434 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#170c2b"><title>Our Little Games ♡</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Our Little Games ♡</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{color-scheme:dark;--pink:#ff578e;--purple:#a777ff;--gold:#ffd478}
-*{box-sizing:border-box}body{margin:0;color:#fff7ff;font:16px/1.5 system-ui,sans-serif;background:radial-gradient(ellipse at top left,#5a245e,transparent 50%),radial-gradient(ellipse at top right,#382d7b,transparent 50%),#170c2b;min-height:100vh}
-main{max-width:900px;margin:auto;padding:20px 14px 60px}header{text-align:center;padding:15px 0 25px}h1,h2,h3{font-family:Georgia,serif}h1{font-size:clamp(35px,8vw,64px);margin:0;color:#ffd1e3}h2{margin:0 0 10px}p{color:#dcc9e9}.eyebrow{color:var(--gold);letter-spacing:3px;font-size:12px}.card{background:linear-gradient(135deg,#392151,#251638);border:1px solid #74518a;border-radius:22px;padding:20px;margin:15px 0;box-shadow:0 15px 35px #0003}.hidden{display:none!important}.row,.actions{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.actions{margin-top:16px}button{font:inherit;font-weight:750;color:white;background:linear-gradient(110deg,#e84686,#8354d7);border:0;border-radius:12px;padding:12px 16px;cursor:pointer}button:disabled{opacity:.45}.secondary,.choice{background:#53336c}.choice{display:block;width:100%;text-align:left;margin:8px 0}.selected{outline:2px solid var(--gold)}label{display:block;margin:12px 0 5px;font-weight:700}input,select,textarea{width:100%;font:inherit;color:white;background:#1b102c;border:1px solid #8a60a3;border-radius:12px;padding:12px}textarea{min-height:95px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.tile{min-height:125px;text-align:left;background:linear-gradient(130deg,#63316d,#342454);border:1px solid #8f6aa8}.tile span{display:block;font-size:28px}.tile small{display:block;font-weight:400}.notice{padding:13px;border-radius:12px;background:#593c76;margin:12px 0;white-space:pre-wrap}.error{background:#803451}.good{background:#245e50}.board3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:350px;margin:18px auto}.board3 button{aspect-ratio:1;font-size:42px}.board7{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:550px;margin:15px auto}.board7 button{aspect-ratio:1;padding:0;font-size:clamp(15px,4vw,30px);background:#4e316c}.board4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:450px;margin:15px auto}.board4 button{aspect-ratio:1;font-size:28px;padding:0}.big{font-size:40px;text-align:center;padding:20px}.score{background:#4a2a64;border-radius:12px;padding:12px;margin:7px 0}.muted{color:#d2bfe0}.history{border-top:1px solid #6b4c7e;padding:12px 0}
+*{box-sizing:border-box}
+body{margin:0;color:#fff7ff;font:16px/1.5 system-ui;background:radial-gradient(ellipse at top left,#5a245e,transparent 50%),radial-gradient(ellipse at top right,#382d7b,transparent 50%),#170c2b;min-height:100vh}
+main{max-width:900px;margin:auto;padding:20px 14px 60px}
+header{text-align:center;padding:15px 0 25px}
+h1,h2,h3{font-family:Georgia,serif}
+h1{font-size:clamp(35px,8vw,64px);margin:0;color:#ffd1e3}
+h2{margin:0 0 10px}
+p{color:#dcc9e9}
+.eyebrow{color:var(--gold);letter-spacing:3px;font-size:12px}
+.card{background:linear-gradient(135deg,#392151,#251638);border:1px solid #74518a;border-radius:22px;padding:20px;margin:15px 0;box-shadow:0 15px 35px #0003}
+.hidden{display:none!important}
+.row,.actions{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.actions{margin-top:16px}
+button{font:inherit;font-weight:750;color:white;background:linear-gradient(110deg,#e84686,#8354d7);border:0;border-radius:12px;padding:12px 16px;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+.secondary,.choice{background:#53336c}
+.choice{display:block;width:100%;text-align:left;margin:8px 0}
+.selected{outline:2px solid var(--gold)}
+label{display:block;margin:12px 0 5px;font-weight:700}
+input,select,textarea{width:100%;font:inherit;color:white;background:#1b102c;border:1px solid #8a60a3;border-radius:12px;padding:12px}
+textarea{min-height:95px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.tile{min-height:125px;text-align:left;background:linear-gradient(130deg,#63316d,#342454);border:1px solid #8f6aa8}
+.tile span{display:block;font-size:28px}
+.tile small{display:block;font-weight:400}
+.notice{padding:13px;border-radius:12px;background:#593c76;margin:12px 0;white-space:pre-wrap}
+.error{background:#803451}.good{background:#245e50}
+.board3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:350px;margin:18px auto}
+.board3 button{aspect-ratio:1;font-size:42px}
+.board7{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:550px;margin:15px auto}
+.board7 button{aspect-ratio:1;padding:0;font-size:clamp(15px,4vw,30px);background:#4e316c}
+.board4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:450px;margin:15px auto}
+.board4 button{aspect-ratio:1;font-size:28px;padding:0}
+.score{background:#4a2a64;border-radius:12px;padding:12px;margin:7px 0}
+.history{border-top:1px solid #6b4c7e;padding:12px 0}
 </style>
 </head>
-<body><main>
-<header><div class="eyebrow">✦ A LITTLE WORLD FOR TWO ✦</div><h1>Our Little Games ♡</h1><p>Piyaa ❤️‍🩹 &amp; Babuchak 😃</p><p>10 different games · Shared turns · Purple magic ✨</p></header>
-<div id="notice" class="notice hidden" role="status"></div>
-<section id="login" class="card"><h2>Private little world 🔐</h2><p>Sign in with your existing Supabase account.</p><form id="loginForm"><label>Email</label><input id="email" type="email" required autocomplete="username"><label>Password</label><input id="password" type="password" required autocomplete="current-password"><div class="actions"><button>Log in ♡</button></div></form></section>
-<section id="claim" class="card hidden"><h2>Who are you? 💌</h2><p>Choose your name once. It stays linked to your login.</p><select id="name"><option value="Piyaa">Piyaa ❤️‍🩹</option><option value="Babuchak">Babuchak 😃</option></select><div class="actions"><button id="claimBtn">Continue ♡</button><button class="secondary logout">Log out</button></div></section>
-<section id="app" class="hidden"><div class="card"><div class="row"><h2 id="welcome">Welcome!</h2><button class="secondary logout">Log out</button></div><div id="scores"></div><div class="actions"><button id="refresh" class="secondary">↻ Refresh</button></div></div>
-<section id="menu" class="card"><h2>🎮 Choose a game</h2><p>One active game at a time. Your friend can continue later on another device.</p><div id="tiles" class="grid"></div></section>
-<section id="game" class="card hidden"><div class="row"><h2 id="gameTitle"></h2><button class="secondary" id="back">← All games</button></div><div id="gameArea"></div></section>
-<section class="card"><h2>📖 Completed games</h2><div id="history"></div></section></section>
+<body>
+<main>
+<header>
+<div class="eyebrow">✦ A LITTLE WORLD FOR TWO ✦</div>
+<h1>Our Little Games ♡</h1>
+<p>Piyaa ❤️‍🩹 &amp; Babuchak 😃</p>
+<p>10 games · Shared turns · Purple magic ✨</p>
+</header>
+
+<div id="notice" class="notice hidden"></div>
+
+<section id="login" class="card">
+<h2>Private little world 🔐</h2>
+<p>Sign in with your existing account.</p>
+<form id="loginForm">
+<label>Email</label><input id="email" type="email" required>
+<label>Password</label><input id="password" type="password" required>
+<div class="actions"><button>Log in ♡</button></div>
+</form>
+</section>
+
+<section id="claim" class="card hidden">
+<h2>Who are you? 💌</h2>
+<select id="name">
+<option value="Piyaa">Piyaa ❤️‍🩹</option>
+<option value="Babuchak">Babuchak 😃</option>
+</select>
+<div class="actions">
+<button id="claimBtn">Continue ♡</button>
+<button class="secondary logout">Log out</button>
+</div>
+</section>
+
+<section id="app" class="hidden">
+<div class="card">
+<div class="row">
+<h2 id="welcome">Welcome!</h2>
+<button class="secondary logout">Log out</button>
+</div>
+<div id="scores"></div>
+<button id="refresh" class="secondary">↻ Refresh</button>
+</div>
+
+<section id="menu" class="card">
+<h2>🎮 Choose a game</h2>
+<p>Play at different times and on separate devices.</p>
+<div id="tiles" class="grid"></div>
+</section>
+
+<section id="game" class="card hidden">
+<div class="row">
+<h2 id="gameTitle"></h2>
+<button class="secondary" id="back">← All games</button>
+</div>
+<div id="gameArea"></div>
+</section>
+
+<section class="card">
+<h2>📖 Completed games</h2>
+<div id="history"></div>
+</section>
+</section>
 </main>
+
 <script>
 'use strict';
-const URL = 'https://hwqccyftcaoqcmxmhdal.supabase.co';
-const KEY = 'sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf';
-const client = window.supabase.createClient(URL, KEY);
-const INFO=[['Friendship Quiz','💌','Four-choice friendship questions'],['Truth or Dare','🔥','Personal truth or funny dare'],['This or That','💞','Pick one of two favourites'],['Tic Tac Toe','❌','Shared X and O board'],['Would You Rather','🤔','Choose a funny situation'],['Guess the Emoji','🧩','Guess a secret from emojis'],['Spin the Bottle','🍾','A random friendship challenge'],['Memory Match','🧠','Match cards across devices'],['Word Scramble','🔤','Solve your friend’s scrambled word'],['Connect Four','🔴','Drop four pieces in a row']];
-const $=id=>document.getElementById(id);let user=null,data=null,chosen=INFO[0][0],busy=false;
-function visible(id){['login','claim','app'].forEach(x=>$(x).classList.toggle('hidden',x!==id))}
-function notice(msg,error=false){$('notice').textContent=msg;$('notice').className='notice '+(error?'error':'good')}
-function node(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n}
-function button(parent,text,click,cls=''){const b=node('button',text,cls);b.type='button';b.onclick=click;parent.append(b);return b}
-function field(parent,title,kind='text',placeholder=''){const l=node('label',title),e=node(kind==='textarea'?'textarea':'input');if(kind!=='textarea')e.type=kind;e.placeholder=placeholder;e.maxLength=500;parent.append(l,e);return e}
-function choose(parent,choices){let selection=null;const wrap=node('div');parent.append(wrap);choices.forEach((text,i)=>button(wrap,text,()=>{selection=i;wrap.querySelectorAll('button').forEach(b=>b.classList.remove('selected'));wrap.children[i].classList.add('selected')},'choice'));return ()=>selection}
-async function api(action,payload={}){if(!client)throw Error('Supabase script did not load. Check your internet.');const {data,error}=await client.rpc('little_api',{p_action:action,p_data:payload});if(error)throw Error(error.message);return data}
-async function run(fn){if(busy)return;busy=true;try{$('notice').classList.add('hidden');await fn()}catch(e){notice(e.message||String(e),true)}finally{busy=false}}
-async function refresh(){data=await api('snapshot');if(!data.me){visible('claim');return}visible('app');$('welcome').textContent='Hello, '+data.me.name+' ♡';$('scores').replaceChildren();(data.players||[]).forEach(p=>$('scores').append(node('div',p.name+' — '+p.points+' points','score')));renderMenu();renderHistory();if(!$('game').classList.contains('hidden'))renderGame()}
-function renderMenu(){const t=$('tiles');t.replaceChildren();INFO.forEach(([name,emoji,desc])=>{const b=button(t,'',()=>{},'tile');b.append(node('span',emoji),node('strong',name),node('small',desc));b.onclick=()=>openGame(name)});if(data.active){const b=node('div','Current game: '+data.active.game+' · '+(data.active.turn_id===user.id?'YOUR TURN':'Friend’s turn'),'notice');t.prepend(b)}}
-function openGame(name){chosen=name;$('menu').classList.add('hidden');$('game').classList.remove('hidden');renderGame()}
-function renderHistory(){const h=$('history');h.replaceChildren();if(!(data.history||[]).length)h.append(node('p','No finished games yet.'));(data.history||[]).forEach(g=>{const name=data.players.find(p=>p.user_id===g.winner_id)?.name||'No winner';h.append(node('div',g.game+' · '+(g.state.result||'finished')+' · '+name,'history'))})}
-function renderGame(){const area=$('gameArea');area.replaceChildren();const g=data.active;$('gameTitle').textContent=(INFO.find(x=>x[0]===chosen)?.[1]||'🎮')+' '+chosen;if(g){if(g.game!==chosen){area.append(node('p','Finish the active '+g.game+' game before starting another.'));button(area,'Open '+g.game,()=>openGame(g.game));return}renderActive(area,g);return}if((data.players||[]).length!==2){area.append(node('p','Waiting for the other player to sign in and claim their name.'));return}renderSetup(area,chosen)}
-function renderSetup(a,game){a.append(node('p','Create a challenge. Your friend will see it when they open the website.'));
-if(game==='Tic Tac Toe'||game==='Connect Four'||game==='Memory Match'){a.append(node('p','Shared board: each move is saved online.'));button(a,'Start shared game',()=>run(async()=>{await api('start',{game});await refresh()}));return}
-let q,options=[],correct=null,kind='';
-if(game==='Truth or Dare'){const s=node('select');['Truth','Dare'].forEach(v=>{const o=node('option',v);o.value=v;s.append(o)});a.append(node('label','Challenge type'),s);kind=()=>s.value;q=field(a,'Write the truth question or dare','textarea','Example: Tell me your funniest memory');}
-else if(game==='Guess the Emoji'){q=field(a,'Emoji clue','text','Example: 🎬🍿');correct=field(a,'Secret answer','text','Example: movie night')}
-else if(game==='Word Scramble'){q=field(a,'Scrambled word','text','Example: ZPIZA');correct=field(a,'Original word','text','Example: PIZZA')}
-else{q=field(a,game==='Spin the Bottle'?'Challenge prompt':'Question','textarea','Write your own question');const n=game==='Friendship Quiz'?4:2;for(let i=0;i<n;i++)options.push(field(a,'Option '+String.fromCharCode(65+i)));if(game==='Friendship Quiz'){const s=node('select');for(let i=0;i<4;i++){const o=node('option','Option '+String.fromCharCode(65+i));o.value=String(i);s.append(o)}a.append(node('label','Correct option'),s);correct=s}}
-button(a,'💌 Save for friend',()=>run(async()=>{const payload={game,question:q.value.trim(),options:options.map(x=>x.value.trim()),correct:correct?(correct.value||'').trim():'',kind:typeof kind==='function'?kind():''};await api('start',payload);await refresh();notice('Saved! Your friend can play later.')}))}
-function renderActive(a,g){const s=g.state,turn=g.turn_id===user.id;a.append(node('p',turn?'✨ Your turn!':'⏳ Waiting for your friend to play.','notice'));
-if(g.game==='Tic Tac Toe'||g.game==='Connect Four'){const isTic=g.game==='Tic Tac Toe',b=node('div',undefined,isTic?'board3':'board7'),cells=s.board||[];a.append(node('p','Your symbol: '+s.marks[user.id]),b);cells.forEach((v,i)=>{const index=isTic?i:i%7;const bt=button(b,v||(isTic?'·':'⚪'),()=>run(async()=>{await api('move',{index});await refresh()}));bt.disabled=!turn||!!v&&isTic});return}
-if(g.game==='Memory Match'){const b=node('div',undefined,'board4'),matched=s.matched||[],flips=s.flips||[];a.append(node('p','Matched pairs: '+matched.length/2+' / 8'),b);for(let i=0;i<16;i++){const revealed=matched.includes(i)||flips.includes(i);const bt=button(b,revealed?s.deck[i]:'❔',()=>run(async()=>{await api('move',{index:i});await refresh()}));bt.disabled=!turn||matched.includes(i)||flips.includes(i)}return}
-a.append(node('h3',s.question||'Challenge'));if(s.kind)a.append(node('p','Type: '+s.kind));if(!turn){a.append(node('p','Your friend will answer this challenge.'));return}
-if(['Friendship Quiz','This or That','Would You Rather','Spin the Bottle'].includes(g.game)){const selected=choose(a,s.options||[]);button(a,'Submit choice',()=>run(async()=>{const i=selected();if(i===null)throw Error('Select an option');const r=await api('move',{answer:String(i)});await refresh();notice(r.result==='win'?'Saved! 🎉':'Answer submitted.');}))}
-else if(g.game==='Truth or Dare'){button(a,'I completed this challenge ✓',()=>run(async()=>{await api('move',{answer:'Completed'});await refresh();notice('Challenge completed! 🎉')}))}
-else{const answer=field(a,'Your answer');button(a,'Check answer',()=>run(async()=>{const r=await api('move',{answer:answer.value.trim()});await refresh();notice(r.result==='win'?'Correct! 🎉':'Not quite! Try a new challenge next time.')}))}}
-$('loginForm').onsubmit=e=>{e.preventDefault();run(async()=>{const {data:d,error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;user=d.user;$('password').value='';await refresh()})};
-$('claimBtn').onclick=()=>run(async()=>{await api('claim',{name:$('name').value});await refresh()});
-document.querySelectorAll('.logout').forEach(b=>b.onclick=()=>run(async()=>{await client.auth.signOut();user=null;data=null;visible('login');$('game').classList.add('hidden');$('menu').classList.remove('hidden')}));
-$('refresh').onclick=()=>run(refresh);$('back').onclick=()=>{$('game').classList.add('hidden');$('menu').classList.remove('hidden')};
-async function boot(){if(!client){notice('Supabase library failed to load',true);return}try{const {data:d}=await client.auth.getUser();user=d?.user||null;if(user)await refresh();else visible('login')}catch(e){notice(e.message,true)}}boot();
-setInterval(()=>{if(user&&!busy&&document.visibilityState==='visible')refresh().catch(()=>{})},20000);
-</script></body></html>
+
+const URL='https://hwqccyftcaoqcmxmhdal.supabase.co';
+const KEY='sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf';
+const client=window.supabase.createClient(URL,KEY);
+
+const INFO=[
+['Friendship Quiz','💌','Four-choice friendship questions'],
+['Truth or Dare','🔥','Personal truth or funny dare'],
+['This or That','💞','Pick one of two favourites'],
+['Tic Tac Toe','❌','Shared X and O board'],
+['Would You Rather','🤔','Choose a funny situation'],
+['Guess the Emoji','🧩','Guess a secret from emojis'],
+['Spin the Bottle','🍾','A random friendship challenge'],
+['Memory Match','🧠','Match cards across devices'],
+['Word Scramble','🔤','Solve a scrambled word'],
+['Connect Four','🔴','Drop four pieces in a row']
+];
+
+const $=id=>document.getElementById(id);
+let user=null,data=null,chosen=INFO[0][0],busy=false;
+
+function visible(id){
+ ['login','claim','app'].forEach(x=>$(x).classList.toggle('hidden',x!==id));
+}
+function notice(msg,error=false){
+ $('notice').textContent=msg;
+ $('notice').className='notice '+(error?'error':'good');
+}
+function node(tag,text,cls){
+ const n=document.createElement(tag);
+ if(text!==undefined)n.textContent=text;
+ if(cls)n.className=cls;
+ return n;
+}
+function button(parent,text,click,cls=''){
+ const b=node('button',text,cls);
+ b.type='button';
+ b.onclick=click;
+ parent.append(b);
+ return b;
+}
+function field(parent,title,kind='text',placeholder=''){
+ const l=node('label',title);
+ const e=node(kind==='textarea'?'textarea':'input');
+ if(kind!=='textarea')e.type=kind;
+ e.placeholder=placeholder;
+ e.maxLength=500;
+ parent.append(l,e);
+ return e;
+}
+async function api(action,payload={}){
+ const {data,error}=await client.rpc('little_api',{
+  p_action:action,p_data:payload
+ });
+ if(error)throw Error(error.message);
+ return data;
+}
+async function run(fn){
+ if(busy)return;
+ busy=true;
+ $('notice').classList.add('hidden');
+ try{await fn();}
+ catch(e){notice(e.message||String(e),true);}
+ finally{busy=false;}
+}
+async function refresh(){
+ data=await api('snapshot');
+ if(!data.me){visible('claim');return;}
+ visible('app');
+ $('welcome').textContent='Hello, '+data.me.name+' ♡';
+ $('scores').replaceChildren();
+ (data.players||[]).forEach(p=>{
+  $('scores').append(node('div',p.name+' — '+p.points+' points','score'));
+ });
+ renderMenu();
+ renderHistory();
+ if(!$('game').classList.contains('hidden'))renderGame();
+}
+function renderMenu(){
+ const t=$('tiles');t.replaceChildren();
+ INFO.forEach(([name,emoji,desc])=>{
+  const b=button(t,'',()=>openGame(name),'tile');
+  b.append(node('span',emoji),node('strong',name),node('small',desc));
+ });
+ if(data.active){
+  const isTurn=data.active.turn_id===user.id;
+  t.prepend(node('div',
+   'Current game: '+data.active.game+' · '+(isTurn?'YOUR TURN':'Friend’s turn'),
+   'notice'
+  ));
+  button(t,'Continue current game',()=>openGame(data.active.game));
+ }
+}
+function openGame(name){
+ chosen=name;
+ $('menu').classList.add('hidden');
+ $('game').classList.remove('hidden');
+ renderGame();
+}
+function renderHistory(){
+ const h=$('history');h.replaceChildren();
+ if(!(data.history||[]).length)h.append(node('p','No finished games yet.'));
+ (data.history||[]).forEach(g=>{
+  const winner=data.players.find(p=>p.user_id===g.winner_id)?.name||'No winner';
+  h.append(node('div',g.game+' · '+(g.state?.result||'Finished')+' · '+winner,'history'));
+ });
+}
+function renderGame(){
+ const area=$('gameArea');area.replaceChildren();
+ const g=data.active;
+ $('gameTitle').textContent=(INFO.find(x=>x[0]===chosen)?.[1]||'🎮')+' '+chosen;
+ if(g){
+  if(g.game!==chosen){
+   area.append(node('p','Finish the active '+g.game+' game first.'));
+   button(area,'Open '+g.game,()=>openGame(g.game));
+   return;
+  }
+  renderActive(area,g);return;
+ }
+ if((data.players||[]).length!==2){
+  area.append(node('p','Waiting for the other player to register.'));
+  return;
+ }
+ renderSetup(area,chosen);
+}
+function renderSetup(a,game){
+ a.append(node('p','Create a question or start a shared board. Your friend can answer later.'));
+ if(['Tic Tac Toe','Connect Four','Memory Match'].includes(game)){
+  button(a,'Start shared game',()=>run(async()=>{
+   await api('start',{game});
+   await refresh();
+  }));
+  return;
+ }
+ let q,options=[],correct,kind='';
+ if(game==='Truth or Dare'){
+  const s=node('select');
+  ['Truth','Dare'].forEach(v=>{
+   const o=node('option',v);o.value=v;s.append(o);
+  });
+  a.append(node('label','Challenge type'),s);
+  kind=s;
+  q=field(a,'Write the truth question or dare','textarea','Write a challenge');
+ }else if(game==='Guess the Emoji'){
+  q=field(a,'Emoji clue','text','Example: 🎬🍿');
+  correct=field(a,'Secret answer','text','Secret answer');
+ }else if(game==='Word Scramble'){
+  q=field(a,'Scrambled word','text','Example: ZPIZA');
+  correct=field(a,'Correct word','text','Example: PIZZA');
+ }else{
+  q=field(a,'Question','textarea','Write your question');
+  const count=game==='Friendship Quiz'?4:2;
+  for(let i=0;i<count;i++){
+   options.push(field(a,'Option '+String.fromCharCode(65+i)));
+  }
+  if(game==='Friendship Quiz'){
+   correct=node('select');
+   for(let i=0;i<4;i++){
+    const o=node('option','Option '+String.fromCharCode(65+i));
+    o.value=String(i);correct.append(o);
+   }
+   a.append(node('label','Correct option'),correct);
+  }
+ }
+ button(a,'💌 Save question for friend',()=>run(async()=>{
+  const question=q.value.trim();
+  if(!question)throw Error('Write a question first.');
+  const opts=options.map(x=>x.value.trim());
+  if(opts.some(x=>!x))throw Error('Fill in every option.');
+  let answer='';
+  if(correct){
+   answer=correct.value.trim();
+   if(!answer)throw Error('Enter the correct answer.');
+  }
+  await api('start',{
+   game,question,options:opts,correct:answer,
+   kind:kind?kind.value:''
+  });
+  await refresh();
+  notice('Question saved! Your friend can answer when they log in.');
+ }));
+}
+function renderActive(a,g){
+ const s=g.state||{};
+ const turn=g.turn_id===user.id;
+ a.append(node('p',turn?'✨ Your turn!':'⏳ Waiting for your friend.','notice'));
+
+ if(['Tic Tac Toe','Connect Four'].includes(g.game)){
+  renderBoard(a,g,s,turn);return;
+ }
+ if(g.game==='Memory Match'){
+  renderMemory(a,s,turn);return;
+ }
+ if(s.phase==='ask'){
+  if(!turn){
+   a.append(node('p','Waiting for the question creator to write another question.'));
+   return;
+  }
+  a.append(node('h3','Your turn to ask! 💌'));
+  a.append(node('p','Previous answer: '+(s.result==='win'?'Correct 🎉':'Not correct')));
+  renderSetup(a,g.game);
+  return;
+ }
+ a.append(node('h3',s.question||'Challenge'));
+ if(s.kind)a.append(node('p','Type: '+s.kind));
+ if(!turn){
+  a.append(node('p','Your friend will answer this question.'));
+  return;
+ }
+ if(['Friendship Quiz','This or That','Would You Rather','Spin the Bottle'].includes(g.game)){
+  let selected=null;
+  (s.options||[]).forEach((v,i)=>{
+   button(a,v,()=>{
+    selected=i;
+    a.querySelectorAll('.choice').forEach(b=>b.classList.remove('selected'));
+    a.querySelectorAll('.choice')[i].classList.add('selected');
+   },'choice');
+  });
+  button(a,'Submit answer',()=>run(async()=>{
+   if(selected===null)throw Error('Choose an option.');
+   const r=await api('move',{answer:String(selected)});
+   await refresh();
+   notice(r.result==='win'?'Correct answer! 🎉':'Wrong answer. Your turn to create a new question.');
+  }));
+ }else if(g.game==='Truth or Dare'){
+  button(a,'I completed this challenge ✓',()=>run(async()=>{
+   await api('move',{answer:'Completed'});
+   await refresh();
+   notice('Challenge completed!');
+  }));
+ }else{
+  const answer=field(a,'Your answer','text','Type your answer');
+  button(a,'Submit answer',()=>run(async()=>{
+   if(!answer.value.trim())throw Error('Enter your answer.');
+   const r=await api('move',{answer:answer.value.trim()});
+   await refresh();
+   notice(r.result==='win'?'Correct! 🎉':'Not correct. Your friend can ask another question.');
+  }));
+ }
+}
+function renderBoard(a,g,s,turn){
+ const tic=g.game==='Tic Tac Toe';
+ const board=node('div',undefined,tic?'board3':'board7');
+ a.append(node('p',tic?'Your symbol: '+(s.marks?.[user.id]||'?'):'Choose a column to drop your piece.'),board);
+ if(tic){
+  (s.board||[]).forEach((v,i)=>{
+   const b=button(board,v||'·',()=>run(async()=>{
+    await api('move',{index:i});await refresh();
+   }));
+   b.disabled=!turn||!!v;
+  });
+ }else{
+  const cells=s.board||[];
+  for(let col=0;col<7;col++){
+   const b=button(board,'↓',()=>run(async()=>{
+    await api('move',{index:col});await refresh();
+   }));
+   b.disabled=!turn||cells.every(row=>row[col]!=='');
+  }
+  const view=node('div');view.style.textAlign='center';
+  cells.forEach(row=>{
+   view.append(node('p',row.map(x=>x==='R'?'🔴':x==='Y'?'🟡':'⚪').join(' ')));
+  });
+  a.append(view);
+ }
+}
+function renderMemory(a,s,turn){
+ const b=node('div',undefined,'board4');
+ a.append(node('p','Matched pairs: '+(s.matched||[]).length/2+' / 8'),b);
+ for(let i=0;i<16;i++){
+  const revealed=(s.matched||[]).includes(i)||(s.flips||[]).includes(i);
+  const bt=button(b,revealed?s.deck[i]:'❔',()=>run(async()=>{
+   await api('move',{index:i});await refresh();
+  }));
+  bt.disabled=!turn||(s.matched||[]).includes(i)||(s.flips||[]).includes(i);
+ }
+}
+$('loginForm').onsubmit=e=>{
+ e.preventDefault();
+ run(async()=>{
+  const {data:d,error}=await client.auth.signInWithPassword({
+   email:$('email').value.trim(),
+   password:$('password').value
+  });
+  if(error)throw error;
+  user=d.user;$('password').value='';
+  await refresh();
+ });
+};
+$('claimBtn').onclick=()=>run(async()=>{
+ await api('claim',{name:$('name').value});
+ await refresh();
+});
+document.querySelectorAll('.logout').forEach(b=>{
+ b.onclick=()=>run(async()=>{
+  await client.auth.signOut();
+  user=null;data=null;visible('login');
+  $('game').classList.add('hidden');
+  $('menu').classList.remove('hidden');
+ });
+});
+$('refresh').onclick=()=>run(refresh);
+$('back').onclick=()=>{
+ $('game').classList.add('hidden');
+ $('menu').classList.remove('hidden');
+};
+async function boot(){
+ try{
+  const {data:d}=await client.auth.getUser();
+  user=d?.user||null;
+  if(user)await refresh();else visible('login');
+ }catch(e){notice(e.message,true);}
+}
+boot();
+setInterval(()=>{
+ if(user&&!busy&&document.visibilityState==='visible'){
+  refresh().catch(e=>notice(e.message,true));
+ }
+},20000);
+</script>
+</body>
+</html>
