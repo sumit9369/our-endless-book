@@ -1,27 +1,504 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Our Little Games ♡</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>:root{font-family:system-ui;color:#493044;background:#fff5fa}*{box-sizing:border-box}body{margin:0;background:linear-gradient(130deg,#fff0f5,#f1eaff);min-height:100vh}main{max-width:850px;margin:auto;padding:22px}header{text-align:center;padding:22px}h1,h2{font-family:Georgia,serif}h1{font-size:clamp(34px,6vw,56px);margin:8px}p{line-height:1.55}.card{background:#fff;border:1px solid #f1dce8;border-radius:22px;padding:22px;margin:16px 0;box-shadow:0 12px 30px #6e3d5b12}.hidden{display:none!important}input,select,textarea,button{font:inherit;border-radius:12px;padding:12px;border:1px solid #dcc8d8}input,textarea,select{width:100%;background:#fff}label{display:block;margin:13px 0 5px;font-weight:600}button{cursor:pointer;background:linear-gradient(100deg,#e66b9b,#806bd0);color:white;border:0;font-weight:700}button:disabled{opacity:.5;cursor:not-allowed}.secondary{background:#f3e7f2;color:#55344d}.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.muted{color:#8a7081}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}.tile{background:#fff5fa;color:#55344d;text-align:left;border:1px solid #ecd6e5;min-height:100px}.tile.active{border:2px solid #a06ad0;background:#f5e8ff}.score{background:#fff3fa;border-radius:12px;padding:12px;text-align:center}.score strong{display:block;font-size:28px}.pill{display:inline-block;background:#f3e4f4;border-radius:50px;padding:8px 12px}.option{display:block;width:100%;text-align:left;margin:8px 0;background:#f7e9f5;color:#52314a}.status{padding:12px;border-radius:12px;background:#fff3e5;margin:10px 0;overflow-wrap:anywhere}.small{font-size:13px}.question{border-top:1px solid #eed9e8;padding-top:15px;margin-top:15px}#message{position:sticky;bottom:10px;background:#55344d;color:white;border-radius:12px;padding:12px;display:none}code{overflow-wrap:anywhere}</style></head><body><main><header><div>✦ 💗 ✦</div><h1>Our Little Games ♡</h1><p>Piyaa ❤️ & Babuchak 😃</p><p class="muted">Two friends • Two hearts • One little world</p></header><section class="card" id="loginCard"><h2>Our private little world 🔐</h2><p>Log in with your Supabase email and password.</p><form id="loginForm"><label>Email</label><input id="email" type="email" autocomplete="email" required><label>Password</label><input id="password" type="password" autocomplete="current-password" required><p><button type="submit">Log in ♡</button></p></form></section><section id="lobby" class="card hidden"><div class="row"><h2>Welcome ♡</h2><button class="secondary" id="logout" type="button">Log out</button></div><p id="account"></p><label>Choose your display name</label><select id="player"><option value="Piyaa">Piyaa ❤️</option><option value="Babuchak">Babuchak 😃</option></select><p class="muted small">Each friend must sign in on their own device. Select different names.</p><button id="create">Create a new room</button><label>Join an existing room (paste full room ID)</label><input id="joinCode" placeholder="Paste room ID here"><p><button id="join">Join room</button></p></section><section id="roomView" class="hidden"><div class="card"><div class="row"><h2>Our room 💗</h2><button class="secondary" id="leave">Leave room</button></div><p>Share this room ID with your friend:</p><div class="status" id="roomLabel"></div><button id="copyCode" class="secondary">Copy room ID</button><p id="connection" class="muted"></p><div class="row"><div class="score">Piyaa ❤️<strong id="scorePiyaa">0</strong></div><div class="score">Babuchak 😃<strong id="scoreBabuchak">0</strong></div></div></div><div class="card"><h2>Choose Our Game ♡</h2><div id="gameGrid" class="grid"></div></div><div class="card"><h2 id="playTitle">Our game</h2><span class="pill" id="turnPill"></span><div id="roundArea"></div><div id="historyArea"></div></div></section><div id="message"></div></main><script>
-'use strict';
-const URL='https://hwqccyftcaoqcmxmhdal.supabase.co',KEY='sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf';
-const GAMES=[['quiz','💞','Friendship Quiz'],['truth','💌','Truth or Dare'],['this','⚡','This or That'],['toe','❌','Tic Tac Toe'],['rather','🤔','Would You Rather'],['emoji','🍀','Guess the Emoji'],['bottle','🍾','Spin the Bottle'],['memory','📸','Memory Match'],['scramble','🔤','Word Scramble'],['connect','🔴','Connect Four']];
-const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let db,user,room,me,questions=[],answers=[],scores=[],poll,loading=false;
-function show(id,v){$(id).classList.toggle('hidden',!v)}function note(s){$('message').textContent=s;$('message').style.display='block';setTimeout(()=>$('message').style.display='none',5500)}
-async function get(q){const {data,error}=await q;if(error)throw error;return data}async function task(fn){if(loading)return;loading=true;try{await fn()}catch(e){note('Error: '+(e.message||e))}finally{loading=false}}
-function label(id){if(!id)return 'Waiting';return id===room?.player1_id?(room.player1_id===user.id?me:'Friend'):(room.player2_id===user.id?me:'Friend')}
-async function boot(){try{db=window.const db = window.supabase.createClient(
-  "https://hwqccyftcaoqcmxmhdal.supabase.co",
-  "sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf"
-);;const {data}=await db.auth.getUser();if(data.user)loggedIn(data.user)}catch(e){note('Supabase could not load: '+e.message)}}
-function loggedIn(u){user=u;show('loginCard',false);show('lobby',true);$('account').textContent='Signed in: '+u.email;const saved=localStorage.getItem('bestie-name-'+u.id);if(saved)$('player').value=saved;const savedRoom=localStorage.getItem('bestie-room-'+u.id);if(savedRoom){get(db.from('bestie_game_rooms').select('*').eq('id',savedRoom).maybeSingle()).then(r=>{if(r&&(r.player1_id===u.id||r.player2_id===u.id))enter(r)}).catch(()=>{})}}
-$('loginForm').onsubmit=e=>{e.preventDefault();task(async()=>{const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;loggedIn(data.user)})};
-$('logout').onclick=()=>task(async()=>{clearInterval(poll);await db.auth.signOut();room=null;user=null;show('roomView',false);show('lobby',false);show('loginCard',true)});
-$('create').onclick=()=>task(async()=>{me=$('player').value;localStorage.setItem('bestie-name-'+user.id,me);const r=await get(db.from('bestie_game_rooms').insert({player1_id:user.id,current_player_id:user.id,game_type:'quiz',status:'waiting'}).select().single());await get(db.from('bestie_game_scores').insert({room_id:r.id,player_id:user.id,points:0,wins:0}));enter(r)});
-$('join').onclick=()=>task(async()=>{me=$('player').value;localStorage.setItem('bestie-name-'+user.id,me);const id=$('joinCode').value.trim();if(!/^[0-9a-f-]{36}$/i.test(id))throw Error('Paste the full room ID from your friend');let r=await get(db.from('bestie_game_rooms').select('*').eq('id',id).single());if(r.player1_id!==user.id){if(r.player2_id&&r.player2_id!==user.id)throw Error('This room already has two players');if(!r.player2_id){r=await get(db.from('bestie_game_rooms').update({player2_id:user.id,status:'playing'}).eq('id',id).is('player2_id',null).select().single());await get(db.from('bestie_game_scores').upsert({room_id:id,player_id:user.id,points:0,wins:0},{onConflict:'room_id,player_id'}))}}enter(r)});
-function enter(r){room=r;localStorage.setItem('bestie-room-'+user.id,r.id);show('lobby',false);show('roomView',true);$('roomLabel').textContent=r.id;clearInterval(poll);refresh();poll=setInterval(refresh,3000)}
-$('leave').onclick=()=>{clearInterval(poll);localStorage.removeItem('bestie-room-'+user.id);room=null;show('roomView',false);show('lobby',true)};
-$('copyCode').onclick=()=>{const code=room.id;if(navigator.clipboard?.writeText)navigator.clipboard.writeText(code).then(()=>note('Room ID copied')).catch(()=>prompt('Copy room ID:',code));else prompt('Copy room ID:',code)};
-async function refresh(){if(!room||loading)return;try{const [r,q,a,s]=await Promise.all([get(db.from('bestie_game_rooms').select('*').eq('id',room.id).single()),get(db.from('bestie_game_questions').select('*').eq('room_id',room.id).order('created_at',{ascending:false}).limit(30)),get(db.from('bestie_game_answers').select('*').order('created_at',{ascending:false}).limit(100)),get(db.from('bestie_game_scores').select('*').eq('room_id',room.id))]);room=r;questions=q;answers=a;scores=s;render()}catch(e){$('connection').textContent='Connection issue: '+e.message}}
-function render(){const other=room.player1_id===user.id?room.player2_id:room.player1_id;const active=questions.find(q=>!answers.some(a=>a.question_id===q.id));const game=GAMES.find(g=>g[0]===room.game_type)||GAMES[0];$('connection').textContent=other?'🟢 Both players connected':'⏳ Waiting for second player to join';$('scorePiyaa').textContent=scores.find(s=>s.player_id===(me==='Piyaa'?user.id:other))?.points??0;$('scoreBabuchak').textContent=scores.find(s=>s.player_id===(me==='Babuchak'?user.id:other))?.points??0;$('gameGrid').innerHTML=GAMES.map(g=>`<button class="tile ${g[0]===game[0]?'active':''}" data-game="${g[0]}">${g[1]}<br><b>${g[2]}</b></button>`).join('');document.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>task(async()=>{if(active)throw Error('Finish the current question first');await get(db.from('bestie_game_rooms').update({game_type:b.dataset.game}).eq('id',room.id));await refresh()}));$('playTitle').textContent=game[1]+' '+game[2];$('turnPill').textContent=room.current_player_id===user.id?'Your turn to ask':'Friend’s turn to ask';if(active){const opts=Array.isArray(active.options)?active.options:typeof active.options==='string'?JSON.parse(active.options):[];$('roundArea').innerHTML=`<div class="question"><h3>${esc(active.question_text)}</h3>${active.questioner_id===user.id?'<p class="muted">Waiting for your friend to answer…</p>':opts.map((o,i)=>`<button class="option" data-answer="${i}">${esc(o)}</button>`).join('')}</div>`;document.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>task(()=>answer(active,Number(b.dataset.answer),opts)))}else if(room.current_player_id===user.id&&other){$('roundArea').innerHTML=`<div class="question"><h3>Ask your friend 💬</h3><label>Question</label><textarea id="qText" rows="3" placeholder="Write your tricky question..."></textarea>${[0,1,2,3].map(i=>`<label>Option ${i+1}</label><input id="opt${i}" placeholder="Answer option ${i+1}">`).join('')}<label>Correct answer</label><select id="correct">${[0,1,2,3].map(i=>`<option value="${i}">Option ${i+1}</option>`).join('')}</select><p><button id="sendQuestion">Save & send question</button></p></div>`;$('sendQuestion').onclick=()=>task(()=>ask(other))}else $('roundArea').innerHTML='<p class="status">'+(other?'Waiting for your friend’s next question.':'Share the room ID so your friend can join.')+'</p>';$('historyArea').innerHTML='<h3>Recent questions</h3>'+(questions.filter(q=>answers.some(a=>a.question_id===q.id)).slice(0,6).map(q=>`<p>💬 ${esc(q.question_text)} — answered</p>`).join('')||'<p class="muted">No completed questions yet.</p>')}
-async function ask(other){const text=$('qText').value.trim(),opts=[0,1,2,3].map(i=>$('opt'+i).value.trim()),correct=Number($('correct').value);if(!text||opts.filter(Boolean).length<2||!opts[correct])throw Error('Enter a question and at least two options, including the correct answer');const q=await get(db.from('bestie_game_questions').insert({room_id:room.id,questioner_id:user.id,receiver_id:other,question_type:room.game_type,question_text:text,options:opts.filter(Boolean),status:'pending'}).select().single());try{await get(db.from('bestie_game_secrets').insert({question_id:q.id,creator_id:user.id,correct_answer:opts[correct]}))}catch(e){note('Question saved, but correct-answer storage failed: '+e.message);return}note('Question sent!');await refresh()}
-async function answer(q,index,opts){if(q.questioner_id===user.id)throw Error('You cannot answer your own question');const chosen=opts[index];const secret=await get(db.from('bestie_game_secrets').select('correct_answer').eq('question_id',q.id).single());const correct=chosen===secret.correct_answer;await get(db.from('bestie_game_answers').insert({question_id:q.id,player_id:user.id,answer_text:chosen,is_correct:correct,approved:true}));await get(db.from('bestie_game_questions').update({status:'answered'}).eq('id',q.id));const current=scores.find(s=>s.player_id===user.id);await get(db.from('bestie_game_scores').update({points:(current?.points||0)+(correct?10:-5),wins:(current?.wins||0)+(correct?1:0)}).eq('room_id',room.id).eq('player_id',user.id));await get(db.from('bestie_game_rooms').update({current_player_id:correct?user.id:q.questioner_id}).eq('id',room.id));note(correct?'Correct! +10 points. Now ask a question!':'Wrong! −5 points. Your friend asks again.');await refresh()}
-boot();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Our Little Games ♡ | Piyaa & Babuchak</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    :root { --ink:#493047; --pink:#b44978; --violet:#6750aa; --paper:#fffafc; --border:#e8dce7; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif; color:var(--ink);
+      background:linear-gradient(140deg,#fff0f6,#f1edff); min-height:100vh; }
+    main { max-width:900px; margin:auto; padding:20px 14px 70px; }
+    header { text-align:center; padding:24px 10px 16px; }
+    h1 { font-family:Georgia,serif; font-size:clamp(2.3rem,6vw,4rem); margin:0; }
+    h2 { font-family:Georgia,serif; margin:0 0 12px; }
+    .subtitle,.muted { color:#806d7d; }
+    .card { background:rgba(255,255,255,.92); border:1px solid var(--border); border-radius:22px;
+      padding:22px; box-shadow:0 12px 35px #5c355b10; margin:14px 0; }
+    .hidden { display:none !important; }
+    label { display:block; font-weight:650; margin:12px 0 5px; }
+    input,textarea,select { width:100%; border:1px solid #d9c7d7; border-radius:12px; padding:12px;
+      font:inherit; background:white; color:var(--ink); }
+    textarea { min-height:95px; resize:vertical; }
+    button { border:0; border-radius:12px; padding:12px 17px; background:linear-gradient(115deg,var(--pink),var(--violet));
+      color:white; font:inherit; font-weight:700; cursor:pointer; }
+    button:disabled { opacity:.55; cursor:not-allowed; }
+    button.secondary { background:#f1eaf3; color:var(--ink); }
+    button.danger { background:#a63e56; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:15px; }
+    .actions > button { flex:1 1 150px; }
+    .pill { background:#f5e9f2; border-radius:999px; padding:6px 12px; display:inline-block; margin:4px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(185px,1fr)); gap:10px; }
+    .game { text-align:left; min-height:88px; background:#fff8fd; border:1px solid #e5cfe2; color:var(--ink); }
+    .game.selected { outline:3px solid #bd78a4; }
+    .game small { display:block; font-weight:400; color:#866d80; }
+    .notice { padding:12px 15px; border-radius:12px; background:#fff3d9; margin:14px 0; }
+    .error { background:#ffe7e7; color:#85283b; }
+    .success { background:#e7f8ef; color:#256747; }
+    .choice { width:100%; margin:5px 0; text-align:left; background:#f7eaf4; color:var(--ink); border:1px solid #e5c8db; }
+    .choice.active { background:#d8b9e7; }
+    .row { display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; }
+    .score { font-weight:800; font-size:1.2rem; }
+    code { overflow-wrap:anywhere; }
+    #toast { position:fixed; left:50%; transform:translateX(-50%); bottom:20px; max-width:92vw;
+      padding:13px 17px; border-radius:12px; color:white; background:#47364d; z-index:10; display:none; }
+    @media(max-width:550px) { .card { padding:16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>✦ A LITTLE WORLD FOR TWO ✦</div>
+    <h1>Our Little Games ♡</h1>
+    <p>Piyaa ❤️ &amp; Babuchak 😃</p>
+    <p class="subtitle">Two friends • Two hearts • One little world ♡</p>
+  </header>
+
+  <div id="status" class="notice hidden" role="status"></div>
+
+  <section id="loginScreen" class="card">
+    <h2>Our private little world 🔐</h2>
+    <p class="muted">Log in with your existing Supabase email and password.</p>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <div class="actions"><button id="loginBtn" type="submit">Log in ♡</button></div>
+    </form>
+  </section>
+
+  <section id="lobbyScreen" class="hidden">
+    <div class="card">
+      <div class="row"><h2>Who's playing? 💌</h2><button id="logoutBtn" class="secondary">Log out</button></div>
+      <p id="accountEmail" class="muted"></p>
+      <label for="displayName">Your player name</label>
+      <select id="displayName">
+        <option value="Piyaa">Piyaa ❤️</option>
+        <option value="Babuchak">Babuchak 😃</option>
+      </select>
+      <p class="muted">Each person must use a different Supabase account and select a different name.</p>
+      <div class="actions"><button id="createBtn">Create a new room</button></div>
+      <label for="joinCode">Or join with room ID</label>
+      <input id="joinCode" placeholder="Paste the room ID from your friend" autocomplete="off">
+      <div class="actions"><button id="joinBtn" class="secondary">Join room</button></div>
+    </div>
+  </section>
+
+  <section id="roomScreen" class="hidden">
+    <div class="card">
+      <div class="row"><h2>Our game room 🏡</h2><button id="leaveBtn" class="secondary">Leave view</button></div>
+      <p>Share this room ID with your friend:</p>
+      <div class="row"><code id="roomCode"></code><button id="copyBtn" class="secondary">Copy ID</button></div>
+      <div id="roomState" class="notice"></div>
+      <div class="row">
+        <span id="playerOne" class="pill"></span><span id="playerTwo" class="pill"></span>
+      </div>
+      <div id="scores" class="row score"></div>
+      <p id="turnText"></p>
+      <div class="actions"><button id="refreshBtn" class="secondary">Refresh now</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Choose our game ♡</h2>
+      <p class="muted">All 10 modes use the same question-and-answer turn system.</p>
+      <div id="gameGrid" class="grid"></div>
+    </div>
+
+    <div id="askCard" class="card hidden">
+      <h2>Your turn to ask ✍️</h2>
+      <p id="askHint" class="muted"></p>
+      <form id="questionForm">
+        <label for="questionText">Your tricky / cute question</label>
+        <textarea id="questionText" maxlength="1000" required placeholder="Write a question for your friend..."></textarea>
+        <label for="option1">Option A</label><input id="option1" maxlength="180" required>
+        <label for="option2">Option B</label><input id="option2" maxlength="180" required>
+        <label for="option3">Option C</label><input id="option3" maxlength="180" required>
+        <label for="option4">Option D</label><input id="option4" maxlength="180" required>
+        <label for="correctOption">Correct answer</label>
+        <select id="correctOption">
+          <option value="0">Option A</option><option value="1">Option B</option>
+          <option value="2">Option C</option><option value="3">Option D</option>
+        </select>
+        <div class="actions"><button id="saveQuestionBtn" type="submit">Save &amp; send question</button></div>
+      </form>
+    </div>
+
+    <div id="answerCard" class="card hidden">
+      <h2>Answer your friend's question 💭</h2>
+      <div id="questionHeading" class="muted"></div>
+      <h3 id="questionDisplay"></h3>
+      <div id="answerChoices"></div>
+      <div class="actions"><button id="submitAnswerBtn" disabled>Submit answer</button></div>
+    </div>
+
+    <div id="waitingCard" class="card hidden">
+      <h2>Waiting for your friend 💌</h2>
+      <p id="waitingText"></p>
+    </div>
+    <div id="resultCard" class="card hidden"><h2>Last answer ✨</h2><p id="lastResult"></p></div>
+  </section>
+</main>
+<div id="toast" role="alert"></div>
+
+<script>
+"use strict";
+
+// Supabase is configured here ONCE. Players never see a connection form.
+const SUPABASE_URL = "https://hwqccyftcaoqcmxmhdal.supabase.co";
+const SUPABASE_KEY = "sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf";
+
+const GAME_MODES = [
+  ["quiz", "💗 Friendship Quiz"],
+  ["truth", "📖 Truth or Dare"],
+  ["this", "⚡ This or That"],
+  ["toe", "❌ Tic Tac Toe"],
+  ["rather", "🤔 Would You Rather"],
+  ["emoji", "🧩 Guess the Emoji"],
+  ["bottle", "🍾 Spin the Bottle"],
+  ["memory", "🗒️ Memory Match"],
+  ["scramble", "🔤 Word Scramble"],
+  ["connect", "🔴 Connect Four"]
+];
+
+const $ = (id) => document.getElementById(id);
+let db, user = null, room = null, questions = [], answers = [], scores = [];
+let chosenAnswer = null, activeQuestion = null, busy = false, refreshTimer = null;
+let gameMode = "quiz", lastSignature = "";
+
+function showScreen(name) {
+  ["loginScreen", "lobbyScreen", "roomScreen"].forEach(id => $(id).classList.toggle("hidden", id !== name));
+}
+function showNotice(message, error = false) {
+  const el = $("status");
+  el.textContent = message;
+  el.className = "notice" + (error ? " error" : "");
+}
+function clearNotice() { $("status").classList.add("hidden"); }
+function toast(message) {
+  $("toast").textContent = message;
+  $("toast").style.display = "block";
+  setTimeout(() => { $("toast").style.display = "none"; }, 4500);
+}
+function report(error) {
+  console.error(error);
+  showNotice(error?.message || String(error), true);
+}
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch =>
+    ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[ch]);
+}
+function formatName(id) {
+  if (!id) return "Waiting for player";
+  if (id === user?.id) return localStorage.getItem("little_games_name") || "You";
+  return "Your friend";
+}
+function otherPlayerId() {
+  if (!room) return null;
+  return room.player1_id === user.id ? room.player2_id : room.player1_id;
+}
+function currentQuestion() {
+  return questions.find(q => q.status !== "answered" && !answers.some(a => a.question_id === q.id)) || null;
+}
+function isMyTurn() { return room?.current_player_id === user?.id; }
+function getOptions(q) {
+  if (!q) return [];
+  const raw = q.options;
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === "string") {
+    try { const parsed = JSON.parse(raw); return Array.isArray(parsed) ? parsed : []; }
+    catch { return []; }
+  }
+  return [];
+}
+function setBusy(value) {
+  busy = value;
+  ["loginBtn", "createBtn", "joinBtn", "saveQuestionBtn", "submitAnswerBtn"].forEach(id => {
+    $(id).disabled = value || (id === "submitAnswerBtn" && chosenAnswer === null);
+  });
+}
+async function checked(promise) {
+  const { data, error } = await promise;
+  if (error) throw error;
+  return data;
+}
+async function init() {
+  if (!window.supabase?.createClient) {
+    showNotice("Supabase library could not load. Check internet access and refresh.", true);
+    return;
+  }
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  GAME_MODES.forEach(([key, title]) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "game";
+    btn.dataset.game = key;
+    btn.textContent = title;
+    btn.addEventListener("click", () => chooseGame(key));
+    $("gameGrid").append(btn);
+  });
+  try {
+    const { data, error } = await db.auth.getUser();
+    if (error && !/session missing/i.test(error.message)) throw error;
+    if (data?.user) {
+      user = data.user;
+      await restoreSession();
+    } else showScreen("loginScreen");
+  } catch (error) { report(error); showScreen("loginScreen"); }
+}
+async function restoreSession() {
+  $("accountEmail").textContent = "Signed in: " + (user.email || "Account");
+  $("displayName").value = localStorage.getItem("little_games_name") || "Piyaa";
+  const savedRoom = localStorage.getItem("little_games_room_" + user.id);
+  if (savedRoom) {
+    try {
+      const found = await checked(db.from("bestie_game_rooms").select("*").eq("id", savedRoom).maybeSingle());
+      if (found && (found.player1_id === user.id || found.player2_id === user.id)) {
+        room = found;
+        await enterRoom();
+        return;
+      }
+    } catch (error) { console.warn("Could not restore room", error); }
+  }
+  showScreen("lobbyScreen");
+}
+async function login(event) {
+  event.preventDefault();
+  clearNotice();
+  setBusy(true);
+  try {
+    const data = await checked(db.auth.signInWithPassword({
+      email: $("email").value.trim(), password: $("password").value
+    }));
+    user = data.user;
+    $("password").value = "";
+    await restoreSession();
+  } catch (error) { report(error); }
+  finally { setBusy(false); }
+}
+async function logout() {
+  stopRefreshing();
+  try { await checked(db.auth.signOut()); }
+  catch (error) { report(error); return; }
+  room = null; user = null;
+  showScreen("loginScreen");
+}
+function saveName() { localStorage.setItem("little_games_name", $("displayName").value); }
+async function createRoom() {
+  clearNotice(); saveName(); setBusy(true);
+  try {
+    const created = await checked(db.from("bestie_game_rooms").insert({
+      player1_id: user.id,
+      current_player_id: user.id,
+      game_type: "quiz",
+      status: "waiting"
+    }).select("*").single());
+    room = created;
+    await enterRoom();
+    toast("Room created! Share the room ID with your friend.");
+  } catch (error) { report(error); }
+  finally { setBusy(false); }
+}
+async function joinRoom() {
+  clearNotice(); saveName(); setBusy(true);
+  try {
+    const code = $("joinCode").value.trim();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(code))
+      throw new Error("Paste the complete room ID shared by your friend.");
+    const found = await checked(db.from("bestie_game_rooms").select("*").eq("id", code).single());
+    if (found.player1_id !== user.id && found.player2_id && found.player2_id !== user.id)
+      throw new Error("This room already has two players.");
+    if (found.player1_id === user.id || found.player2_id === user.id) {
+      room = found;
+    } else {
+      const updated = await checked(db.from("bestie_game_rooms")
+        .update({ player2_id: user.id, status: "playing" })
+        .eq("id", code).is("player2_id", null).select("*").single());
+      room = updated;
+    }
+    await enterRoom();
+  } catch (error) { report(error); }
+  finally { setBusy(false); }
+}
+async function enterRoom() {
+  localStorage.setItem("little_games_room_" + user.id, room.id);
+  $("roomCode").textContent = room.id;
+  showScreen("roomScreen");
+  await refreshRoom();
+  startRefreshing();
+}
+function stopRefreshing() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = null;
+}
+function startRefreshing() {
+  stopRefreshing();
+  refreshTimer = setInterval(() => { if (!busy && room) refreshRoom().catch(report); }, 3000);
+}
+async function leaveRoom() {
+  stopRefreshing();
+  if (user) localStorage.removeItem("little_games_room_" + user.id);
+  room = null;
+  showScreen("lobbyScreen");
+}
+async function refreshRoom() {
+  if (!room || !user) return;
+  const roomId = room.id;
+  const [freshRoom, freshQuestions, freshScores] = await Promise.all([
+    checked(db.from("bestie_game_rooms").select("*").eq("id", roomId).single()),
+    checked(db.from("bestie_game_questions").select("*").eq("room_id", roomId).order("created_at", { ascending:false }).limit(100)),
+    checked(db.from("bestie_game_scores").select("*").eq("room_id", roomId))
+  ]);
+  if (!room || room.id !== roomId) return;
+  room = freshRoom;
+  questions = freshQuestions || [];
+  scores = freshScores || [];
+  const ids = questions.map(q => q.id);
+  answers = ids.length ? await checked(db.from("bestie_game_answers").select("*").in("question_id", ids)) : [];
+  gameMode = room.game_type || "quiz";
+  render();
+}
+function chooseGame(mode) {
+  if (!room || !user) return;
+  if (!isMyTurn()) { toast("Only the current questioner can choose the game."); return; }
+  if (currentQuestion()) { toast("Finish the current question first."); return; }
+  db.from("bestie_game_rooms").update({ game_type: mode }).eq("id", room.id)
+    .then(({ error }) => { if (error) report(error); else refreshRoom().catch(report); });
+}
+function render() {
+  if (!room || !user) return;
+  $("roomState").textContent = room.player2_id ? "Both players joined ✓" : "Waiting for your friend to join…";
+  $("playerOne").textContent = "Player 1: " + formatName(room.player1_id);
+  $("playerTwo").textContent = "Player 2: " + formatName(room.player2_id);
+  $("scores").textContent = scores.map(s =>
+    `${formatName(s.player_id)}: ${s.points ?? 0} points`
+  ).join("  •  ") || "Scores will appear after the first answer.";
+  $("turnText").textContent = isMyTurn() ? "Your turn to ask 💌" : "Your friend's turn to ask 💌";
+  document.querySelectorAll(".game").forEach(btn =>
+    btn.classList.toggle("selected", btn.dataset.game === gameMode));
+  const q = currentQuestion();
+  const ready = Boolean(room.player2_id);
+  $("askCard").classList.toggle("hidden", !ready || !!q || !isMyTurn());
+  $("answerCard").classList.toggle("hidden", !ready || !q || q.questioner_id === user.id);
+  $("waitingCard").classList.toggle("hidden", ready && (!q || q.questioner_id !== user.id));
+  $("waitingText").textContent = !ready ? "Share the room ID and wait for your friend." :
+    q ? "Your question is saved. Waiting for your friend's answer." : "Waiting for your friend to create a question.";
+  $("askHint").textContent = "Game: " + (GAME_MODES.find(g => g[0] === gameMode)?.[1] || gameMode);
+  if (q && q.questioner_id !== user.id) renderQuestion(q);
+  const lastQ = questions.find(item => answers.some(a => a.question_id === item.id));
+  const lastA = lastQ ? answers.find(a => a.question_id === lastQ.id) : null;
+  $("resultCard").classList.toggle("hidden", !lastA);
+  if (lastA) $("lastResult").textContent =
+    (lastA.is_correct === true ? "Correct answer! +10 points 🎉" :
+      lastA.is_correct === false ? "Wrong answer! −5 points 💭" : "Answer submitted.");
+}
+function renderQuestion(q) {
+  if (activeQuestion?.id !== q.id) { chosenAnswer = null; $("submitAnswerBtn").disabled = true; }
+  activeQuestion = q;
+  $("questionHeading").textContent = "From your friend • " + (GAME_MODES.find(g => g[0] === q.question_type)?.[1] || "Game");
+  $("questionDisplay").textContent = q.question_text || "";
+  const choices = $("answerChoices");
+  choices.replaceChildren();
+  getOptions(q).forEach((option, index) => {
+    const btn = document.createElement("button");
+    btn.className = "choice" + (chosenAnswer === index ? " active" : "");
+    btn.textContent = String.fromCharCode(65 + index) + ". " + option;
+    btn.addEventListener("click", () => {
+      chosenAnswer = index;
+      $("submitAnswerBtn").disabled = false;
+      choices.querySelectorAll("button").forEach((b,i) => b.classList.toggle("active", i === index));
+    });
+    choices.append(btn);
+  });
+}
+async function saveQuestion(event) {
+  event.preventDefault();
+  clearNotice();
+  if (!room?.player2_id || !isMyTurn() || currentQuestion()) {
+    toast("Wait until it's your turn and the previous question is finished."); return;
+  }
+  const opts = [1,2,3,4].map(n => $("option" + n).value.trim());
+  if (opts.some(x => !x)) { toast("Fill in all four options."); return; }
+  setBusy(true);
+  let newQuestion = null;
+  try {
+    const receiver = otherPlayerId();
+    newQuestion = await checked(db.from("bestie_game_questions").insert({
+      room_id: room.id, questioner_id: user.id, receiver_id: receiver,
+      question_type: gameMode, question_text: $("questionText").value.trim(),
+      options: opts, status: "pending"
+    }).select("*").single());
+    await checked(db.from("bestie_game_secrets").insert({
+      question_id: newQuestion.id, creator_id: user.id,
+      correct_answer: opts[Number($("correctOption").value)]
+    }));
+    $("questionForm").reset();
+    toast("Question sent to your friend!");
+    await refreshRoom();
+  } catch (error) {
+    report(error);
+    if (newQuestion) showNotice("Question was created but saving its answer failed. Check your Supabase permissions before creating another.", true);
+  } finally { setBusy(false); }
+}
+async function submitAnswer() {
+  clearNotice();
+  if (!room || !user || chosenAnswer === null) return;
+  const q = currentQuestion();
+  if (!q || q.questioner_id === user.id || q.receiver_id !== user.id) {
+    toast("You cannot answer this question."); return;
+  }
+  const options = getOptions(q);
+  const submitted = options[chosenAnswer];
+  if (submitted === undefined) return;
+  setBusy(true);
+  try {
+    // Note: browser-side score validation is not tamper-proof.
+    // Supabase RLS must restrict secret access and unauthorized writes.
+    const secret = await checked(db.from("bestie_game_secrets")
+      .select("correct_answer").eq("question_id", q.id).single());
+    const correct = submitted === secret.correct_answer;
+    await checked(db.from("bestie_game_answers").insert({
+      question_id: q.id, player_id: user.id,
+      answer_text: submitted, is_correct: correct, approved: true
+    }));
+    await checked(db.from("bestie_game_questions").update({ status:"answered" }).eq("id", q.id));
+    const oldScore = scores.find(s => s.player_id === user.id);
+    const newPoints = (oldScore?.points || 0) + (correct ? 10 : -5);
+    if (oldScore) {
+      await checked(db.from("bestie_game_scores").update({ points:newPoints })
+        .eq("room_id", room.id).eq("player_id", user.id));
+    } else {
+      await checked(db.from("bestie_game_scores").insert({
+        room_id: room.id, player_id: user.id, points:newPoints, wins:0
+      }));
+    }
+    await checked(db.from("bestie_game_rooms").update({
+      current_player_id: correct ? user.id : q.questioner_id
+    }).eq("id", room.id));
+    chosenAnswer = null;
+    toast(correct ? "Correct! +10 points. Your turn to ask!" : "Wrong! −5 points. Your friend asks again.");
+    await refreshRoom();
+  } catch (error) {
+    report(error);
+    showNotice("Answer could not be completed. Your Supabase RLS policies may need adjustment. Do not submit repeatedly until checked.", true);
+  } finally { setBusy(false); }
+}
+
+$("loginForm").addEventListener("submit", login);
+$("logoutBtn").addEventListener("click", logout);
+$("createBtn").addEventListener("click", createRoom);
+$("joinBtn").addEventListener("click", joinRoom);
+$("leaveBtn").addEventListener("click", leaveRoom);
+$("refreshBtn").addEventListener("click", () => refreshRoom().catch(report));
+$("questionForm").addEventListener("submit", saveQuestion);
+$("submitAnswerBtn").addEventListener("click", submitAnswer);
+$("copyBtn").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(room.id); toast("Room ID copied!"); }
+  catch { toast("Select and copy the room ID above."); }
+});
+window.addEventListener("load", init);
+</script>
+</body>
+</html>
