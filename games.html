@@ -1,1758 +1,313 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Our Talk Diaries ❤️‍🩹</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#170c2b">
+<title>Our Little Games ♡</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#130b20;--card:#251633;--card2:#342044;--pink:#ff80b5;--purple:#bd91ff;--text:#fff5fc;--muted:#c6b3d1;--green:#7ee6a7;--red:#ff8295}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(circle at top,#422453,var(--bg) 65%);font-family:Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{border:0;border-radius:12px;padding:12px 16px;background:linear-gradient(120deg,var(--pink),var(--purple));color:#260e31;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}button.secondary{background:#493258;color:white}button.danger{background:#963a58;color:white}button.small{padding:8px 11px;font-size:12px}
+input,textarea,select{width:100%;padding:13px;margin:7px 0 14px;border:1px solid #654777;border-radius:11px;background:#180f25;color:white;outline:none}textarea{min-height:85px;resize:vertical}label{font-size:13px;color:var(--muted)}
+h1,h2,h3{margin-top:0}p{line-height:1.5}.hidden{display:none!important}.muted{color:var(--muted)}.center{text-align:center}
+.wrap{max-width:760px;margin:auto;padding:17px}.logo{text-align:center;padding:22px 10px}.logo .heart{font-size:43px}.logo h1{color:var(--pink);margin:8px 0}.logo p{color:var(--muted);margin:0}
+.card{background:linear-gradient(145deg,var(--card),#1b1027);border:1px solid #50365f;border-radius:18px;padding:18px;margin:13px 0;box-shadow:0 10px 30px #0003}
+.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1;min-width:0}.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}.topbar strong{color:var(--pink)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.tile{background:#30203e;border:1px solid #684b7b;border-radius:15px;padding:17px 9px;text-align:center;cursor:pointer}.tile .emoji{font-size:31px;display:block;margin-bottom:9px}.tile b{font-size:14px}
+.session{background:#2b1b3a;border:1px solid #523765;border-radius:14px;padding:14px;margin:10px 0}.session-head{display:flex;justify-content:space-between;gap:8px;align-items:center}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.pill{display:inline-block;background:#4b315c;border-radius:30px;padding:5px 10px;font-size:11px;color:#f6d7ff}
+.notice{padding:12px;border-radius:12px;background:#352342;margin:12px 0;font-size:14px}.success{color:var(--green)}.error{color:var(--red)}
+.option{display:block;width:100%;margin:9px 0;background:#3b294b;color:white;border:1px solid #73518a;text-align:left}.option.selected{border:2px solid var(--pink);background:#55334f}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:340px;margin:20px auto}.cell{aspect-ratio:1;background:#342341;color:white;border:1px solid #79568d;border-radius:15px;font-size:40px;font-weight:bold;padding:0}.cell.x{color:var(--pink)}.cell.o{color:var(--purple)}
+.score{display:flex;justify-content:space-between;background:#30203e;border-radius:12px;padding:12px;margin:8px 0}.footer{text-align:center;color:#907c9e;font-size:12px;padding:25px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#392647;color:white;padding:12px 18px;border-radius:12px;z-index:10;display:none;max-width:90%;box-shadow:0 5px 25px #0008}
+hr{border:0;border-top:1px solid #50365f;margin:17px 0}
+@media(max-width:430px){.wrap{padding:12px}.card{padding:15px}h1{font-size:25px}}
+</style>
 </head>
 <body>
-  <a href="games.html" class="games-floating-btn">
-  🎮 Play Bestie Games ♡
-</a>
+<div class="wrap">
+<header class="logo"><div class="heart">💜</div><h1>Our Little Games ♡</h1><p>Two friends. Five games. Unlimited memories.</p></header>
 
-<style>
-.games-floating-btn {
-  position: fixed;
-  bottom: 25px;
-  right: 20px;
-  z-index: 99999;
-  padding: 14px 20px;
-  border-radius: 30px;
-  background: linear-gradient(135deg, #792e49, #bb7181);
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  text-decoration: none;
-  box-shadow: 0 5px 20px rgba(0,0,0,.3);
-  animation: gamesPulse 2s infinite;
-}
-
-@keyframes gamesPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
-}
-</style>
-<section id="loginScreen" class="cover-screen">
-  <div class="cover-book">
-    <div class="ornament">✦ ❦ ✦</div>
-    <p class="eyebrow">OUR PRIVATE LITTLE WORLD</p>
-    <h1>Only For Us ♡</h1>
-    <p class="names">Piyaaa ❤️‍🩹 & Babuchak 😃</p>
-
-    <form id="loginForm">
-      <input id="loginEmail" type="email"
-        placeholder="Enter your email" required
-        autocomplete="username">
-
-      <input id="loginPassword" type="password"
-        placeholder="Enter your password" required
-        autocomplete="current-password">
-
-      <button type="submit" class="gold-btn full">
-        Unlock Our World ♡
-      </button>
-    </form>
-
-    <p id="loginError" role="alert"></p>
-  </div>
-</section>
-<section id="cover" class="cover-screen hidden">
-  <div class="cover-book">
-    <div class="ornament">✦ ❦ ✦</div>
-    <p class="eyebrow">TWO HEARTS · ONE DIARY</p>
-    <h1>Our Talk<br>Diaries</h1>
-    <div class="cover-heart">❤️‍🩹</div>
-    <p class="names">Piyaaa & Babuchak</p>
-    <p class="cover-quote">Some stories are written.<br>Ours is still being lived.</p>
-    <button id="openBook" class="gold-btn">Open Our World ♡</button>
-    <p class="eyebrow cover-bottom">A STORY WITHOUT AN END</p>
-  </div>
+<section id="loginScreen" class="card">
+<h2 class="center">Welcome back ♡</h2><p class="muted center">Login with your existing game account.</p>
+<label>Email</label><input id="email" type="email" autocomplete="username" placeholder="Enter email">
+<label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter password">
+<button style="width:100%" onclick="login()">Login</button><p id="loginMessage" class="center muted"></p>
 </section>
 
-<main id="reader" class="reader hidden">
-  <header class="reader-header">
-    <span class="brand">❦ Our Talk Diaries</span>
-    <button id="closeBook" class="soft-btn">Close Book</button>
-  </header>
+<section id="registerScreen" class="card hidden">
+<h2 class="center">Who are you? ♡</h2><p class="muted center">Choose your game identity.</p>
+<button style="width:100%;margin:6px 0" onclick="claimPlayer('Piyaa')">💗 Piyaa</button>
+<button style="width:100%;margin:6px 0" onclick="claimPlayer('Babuchak')">💜 Babuchak</button>
+<p id="registerMessage" class="center muted"></p>
+</section>
 
-  <div class="book-frame">
-    <article id="paper" class="paper">
-      <div class="ornament">✦ ❦ ✦</div>
-      <div id="pageContent" class="page-content"></div>
-      <footer class="paper-footer">
-        <span>Piyaaa ❤️‍🩹 & Babuchak 😃</span>
-        <span id="pageNumber"></span>
-      </footer>
-    </article>
-  </div>
+<section id="homeScreen" class="hidden">
+<div class="topbar"><div>Playing as <strong id="playerName">...</strong></div><button class="secondary small" onclick="logout()">Logout</button></div>
+<div class="card"><h2>🏆 Friendship Scores</h2><div id="scores"></div></div>
+<div class="card"><h2>🎮 Choose a game</h2><div class="grid">
+<div class="tile" onclick="newGame('Friendship Quiz')"><span class="emoji">🧠</span><b>Friendship Quiz</b></div>
+<div class="tile" onclick="newGame('This or That')"><span class="emoji">⚖️</span><b>This or That</b></div>
+<div class="tile" onclick="newGame('Tic Tac Toe')"><span class="emoji">⭕</span><b>Tic Tac Toe</b></div>
+<div class="tile" onclick="newGame('Word Scramble')"><span class="emoji">🔤</span><b>Word Scramble</b></div>
+<div class="tile" onclick="newGame('Guess the Emoji')"><span class="emoji">🤔</span><b>Guess the Emoji</b></div>
+</div></div>
+<div class="card"><div class="topbar"><h2>📚 Your saved games</h2><button class="secondary small" onclick="loadHome()">Refresh</button></div><div id="sessions"><p class="muted">Loading games...</p></div></div>
+</section>
 
-  <nav class="page-nav">
-    <button id="prevPage" class="nav-btn">← Previous</button>
-    <span id="pageCount"></span>
-    <button id="nextPage" class="nav-btn">Next →</button>
-  </nav>
-
-  <div class="action-bar">
-    <button id="editPage" class="soft-btn">✎ Edit Page</button>
-    <button id="addPage" class="soft-btn">+ New Chapter</button>
-    <button
-      class="soft-btn"
-      onclick="importMyExistingChapters()">
-      Import Old Chapters
-    </button>
-    <button id="goDiary" class="soft-btn">💌 Talk Diaries</button>
-  </div>
-</main>
-
-<!-- MUSIC PLAYER OUTSIDE THE BOOK -->
-<div class="music-widget">
-  <div id="musicPanel" class="music-panel hidden">
-    <div class="music-heading">
-      <strong>♫ Our Playlist</strong>
-      <span id="songPosition">0 / 0</span>
-    </div>
-    <p id="songTitle">No songs added</p>
-    <div class="music-controls">
-      <button id="previousSong" aria-label="Previous song">⏮</button>
-      <button id="playSong" aria-label="Play or pause">▶</button>
-      <button id="nextSong" aria-label="Next song">⏭</button>
-      <button id="stopSong" aria-label="Stop music">⏹</button>
-    </div>
-    <label for="volume">Volume</label>
-    <input id="volume" type="range" min="0" max="1" step=".05" value=".6">
-    <button id="manageSongs" class="soft-btn">+ Manage Songs</button>
-  </div>
-  <button id="musicToggle" class="music-fab"
-          aria-label="Toggle music player"
-          aria-expanded="false">♫</button>
+<section id="gameScreen" class="hidden">
+<div class="topbar"><button class="secondary small" onclick="goHome()">← Home</button><span id="gameStatus" class="pill">Loading</span></div>
+<div class="card">
+<h2 id="gameTitle">Game</h2><div id="gameInfo" class="muted"></div>
+<div id="gameContent"></div>
+<div class="actions"><button class="secondary small" onclick="refreshGame()">↻ Refresh</button><button class="secondary small" onclick="exitGame()">Exit game</button><button class="danger small" onclick="clearGame()">Clear game</button></div>
 </div>
-<audio id="backgroundAudio" preload="none"></audio>
-
-<!-- EDIT PAGE -->
-<div id="editorModal" class="modal hidden">
-  <div class="modal-box">
-    <button class="modal-close" data-close="editorModal">×</button>
-    <h2>Edit Our Chapter ✍️</h2>
-    <label for="chapterTitle">Chapter title</label>
-    <input id="chapterTitle" maxlength="100">
-    <label for="chapterText">Your words</label>
-    <textarea id="chapterText" rows="8"></textarea>
-    <label for="mediaType">Media type</label>
-    <select id="mediaType">
-      <option value="none">None</option>
-      <option value="photo">Photo</option>
-      <option value="video">Video</option>
-    </select>
-    <label for="mediaUrl">Photo / video path</label>
-    <input id="mediaUrl" placeholder="assets/photos/our-photo.jpg">
-    <button id="savePage" class="gold-btn full">Save Chapter ♡</button>
-    <button id="deletePage" class="text-danger">Delete Chapter</button>
-  </div>
+</section>
+<div class="footer">Made with ♡ for Piyaa & Babuchak</div>
 </div>
-
-<!-- TALK DIARY -->
-<div id="diaryModal" class="modal hidden">
-  <div class="modal-box diary-box">
-    <button class="modal-close" data-close="diaryModal">×</button>
-    <h2>Our Never-Ending Talks 💌</h2>
-    <p class="muted">Write anything. Every message becomes another memory.</p>
-    <div id="diaryMessages" class="diary-messages"></div>
-    <label for="diaryAuthor">Who is writing?</label>
-    <select id="diaryAuthor">
-      <option value="Babuchak 😃">Babuchak 😃</option>
-      <option value="Piyaaa ❤️‍🩹">Piyaaa ❤️‍🩹</option>
-    </select>
-    <textarea id="diaryText" rows="4"
-      placeholder="Something I want to tell you..."></textarea>
-    <button id="sendDiary" class="gold-btn full">Save My Message ♡</button>
-  </div>
-</div>
-
-<!-- PLAYLIST EDITOR -->
-<div id="playlistModal" class="modal hidden">
-  <div class="modal-box">
-    <button class="modal-close" data-close="playlistModal">×</button>
-    <h2>Our Songs 🎵</h2>
-    <p class="muted">Use an MP3 file path or direct audio URL.</p>
-    <label for="songName">Song name</label>
-    <input id="songName" placeholder="Our special song">
-    <label for="songUrl">Audio file path</label>
-    <input id="songUrl" placeholder="assets/music/song.mp3">
-    <button id="addSong" class="gold-btn full">Add Song</button>
-    <div id="playlistList" class="playlist-list"></div>
-  </div>
-</div>
-
-<div id="toast" class="toast hidden" role="status"></div>
-
-  <!-- SUPABASE CONNECTION -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<div id="toast"></div>
 
 <script>
-window.diaryDB = window.supabase.createClient(
-  "https://hwqccyftcaoqcmxmhdal.supabase.co",
-  "sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf"
-);
-
-console.log("Supabase initialized!");
-</script>
-<style>
-  #loginForm {
-  width: 100%;
-  max-width: 300px;
-  display: grid;
-  gap: 15px;
-  margin: 25px auto;
-}
-
-#loginForm input {
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid #c7a36a;
-  background: #fff8eb;
-  color: #35231d;
-  width: 100%;
-}
-
-#loginError {
-  color: #ffd0c8;
-  font-size: 13px;
-}
-:root {
-  --brown: #35231d;
-  --paper: #f8efd9;
-  --gold: #c7a36a;
-  --ink: #473329;
-  --muted: #8b7465;
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "DM Sans", sans-serif;
-  color: var(--ink);
-  background: radial-gradient(circle at top, #805b47, #251712 80%);
-}
-
-button, input, textarea, select { font: inherit; }
-button { cursor: pointer; }
-.hidden { display: none !important; }
-
-.cover-screen {
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 25px;
-  perspective: 1200px;
-}
-
-.cover-book {
-  width: min(420px, 100%);
-  min-height: 570px;
-  padding: 45px 25px;
-  color: #f5e5c8;
-  text-align: center;
-  border-radius: 5px 18px 18px 5px;
-  border: 2px solid #ac8656;
-  background: linear-gradient(105deg, #24140f, #634032 50%, #291914);
-  box-shadow: inset 14px 0 20px #0006,
-    inset 0 0 0 12px #b9965a40,
-    inset 0 0 0 15px #b9965a60,
-    18px 20px 35px #0009;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  animation: appear 1s ease;
-}
-
-.ornament {
-  text-align: center;
-  color: var(--gold);
-  letter-spacing: 8px;
-  font-size: 22px;
-  margin-bottom: 25px;
-}
-
-.eyebrow {
-  font-size: 10px;
-  letter-spacing: 3px;
-  color: #ddbe8c;
-}
-
-.cover-book h1 {
-  font-family: "Cormorant Garamond", serif;
-  font-size: clamp(55px, 12vw, 78px);
-  line-height: .95;
-  margin: 25px 0;
-}
-
-.cover-heart {
-  font-size: 45px;
-  animation: heartbeat 2.5s infinite;
-}
-
-.names {
-  font-family: "Caveat", cursive;
-  font-size: 36px;
-  margin: 20px 0 8px;
-}
-
-.cover-quote {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 23px;
-  font-style: italic;
-  margin-bottom: 30px;
-}
-
-.cover-bottom { margin-top: 40px; }
-
-.gold-btn {
-  background: linear-gradient(135deg, #e9cd97, #b58b51);
-  color: #35231d;
-  border: 1px solid #efd6a8;
-  border-radius: 30px;
-  padding: 13px 24px;
-  font-weight: 600;
-  box-shadow: 0 5px 12px #0003;
-}
-
-.full { width: 100%; margin-top: 15px; }
-
-.reader {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px 16px 110px;
-}
-
-.reader-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 25px;
-  color: #f9e9d0;
-}
-
-.brand {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 25px;
-  font-weight: 600;
-}
-
-.soft-btn {
-  background: #f4e5d1;
-  border: 1px solid #c5a37b;
-  color: #493025;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.book-frame { perspective: 1600px; }
-
-.paper {
-  min-height: 650px;
-  padding: 42px 45px 30px;
-  border-radius: 5px 15px 15px 5px;
-  background:
-    repeating-linear-gradient(
-      0deg, transparent 0px, #73512e06 3px, transparent 6px
-    ),
-    linear-gradient(110deg, #e7d1a8, #fff5df 10%, #f8efd9 90%, #e7d1a8);
-  box-shadow: inset 13px 0 22px #65432620,
-    9px 12px 0 #d3bd9a,
-    15px 20px 30px #0007;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.page-content { flex: 1; overflow-wrap: anywhere; }
-
-.page-content h2 {
-  font-family: "Cormorant Garamond", serif;
-  font-size: clamp(38px, 8vw, 55px);
-  text-align: center;
-  margin: 12px 0 25px;
-}
-
-.chapter-label {
-  display: block;
-  text-align: center;
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: #a17b55;
-}
-
-.story-text {
-  white-space: pre-wrap;
-  font-family: "Cormorant Garamond", serif;
-  font-size: 25px;
-  line-height: 1.55;
-}
-
-.placeholder {
-  text-align: center;
-  color: #a78c6d;
-  font-family: "Caveat", cursive;
-  font-size: 29px;
-  margin: 60px 0;
-}
-
-.opening-photo {
-  display: block;
-  width: min(340px, 100%);
-  max-height: 350px;
-  object-fit: contain;
-  margin: 20px auto;
-  padding: 10px 10px 25px;
-  background: white;
-  box-shadow: 0 7px 20px #0003;
-  transform: rotate(-2deg);
-}
-
-.photo-placeholder {
-  width: min(340px, 100%);
-  min-height: 230px;
-  margin: 20px auto;
-  border: 2px dashed #bca07b;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  padding: 20px;
-  color: #9b7b5d;
-  font-family: "Caveat", cursive;
-  font-size: 26px;
-}
-
-.love-quote {
-  text-align: center;
-  font-family: "Caveat", cursive;
-  font-size: 32px;
-  color: #815842;
-  margin: 30px 0;
-}
-
-.page-media {
-  display: block;
-  width: 100%;
-  max-height: 380px;
-  object-fit: contain;
-  margin: 20px auto;
-  border-radius: 8px;
-}
-
-.joke-card {
-  padding: 16px;
-  margin: 13px 0;
-  border: 1px solid #d6bb92;
-  border-radius: 10px;
-  background: #fff9e7a8;
-  font-family: "Caveat", cursive;
-  font-size: 24px;
-  white-space: pre-wrap;
-}
-
-.paper-footer {
-  border-top: 1px solid #bda17e;
-  padding-top: 14px;
-  margin-top: 30px;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  color: #967757;
-  font-family: "Caveat", cursive;
-  font-size: 19px;
-}
-
-.page-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin: 32px 0 20px;
-  color: #fff0d7;
-}
-
-.nav-btn {
-  background: #e9d5b5;
-  border: 1px solid #c8a67c;
-  border-radius: 25px;
-  padding: 12px 16px;
-  font-weight: 600;
-}
-
-.nav-btn:disabled { opacity: .4; }
-
-.action-bar {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: #160d0bdb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 15px;
-}
-
-.modal-box {
-  width: min(520px, 100%);
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  padding: 30px 22px;
-  border: 4px double #b9976e;
-  border-radius: 12px;
-  background: var(--paper);
-}
-
-.modal-box h2 {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 36px;
-  margin: 0 30px 15px 0;
-}
-
-.modal-close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  border: 0;
-  background: transparent;
-  font-size: 32px;
-}
-
-.modal-box label {
-  display: block;
-  margin: 16px 0 7px;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.modal-box input,
-.modal-box select,
-.modal-box textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #c7ae8b;
-  border-radius: 8px;
-  background: #fffbf1;
-  color: var(--ink);
-}
-
-.modal-box textarea { resize: vertical; }
-
-.muted {
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--muted);
-}
-
-.text-danger {
-  display: block;
-  margin: 18px auto 0;
-  border: 0;
-  background: transparent;
-  color: #a23d35;
-  text-decoration: underline;
-}
-
-.diary-box { width: min(600px, 100%); }
-
-.diary-messages {
-  height: min(350px, 45vh);
-  overflow-y: auto;
-  padding: 14px;
-  border: 1px solid #d3ba96;
-  border-radius: 12px;
-  background: #f0e1c5;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.diary-message {
-  width: fit-content;
-  max-width: 85%;
-  padding: 12px 15px;
-  border-radius: 15px;
-  background: #fff9ea;
-  box-shadow: 0 2px 5px #0001;
-  overflow-wrap: anywhere;
-}
-
-.diary-message.piyaaa {
-  align-self: flex-end;
-  background: #e8cdbf;
-}
-
-.diary-message strong {
-  font-family: "Caveat", cursive;
-  font-size: 23px;
-}
-
-.diary-message p {
-  white-space: pre-wrap;
-  line-height: 1.5;
-  margin: 7px 0;
-}
-
-.diary-message small {
-  font-size: 10px;
-  color: #816b59;
-}
-
-.music-widget {
-  position: fixed;
-  right: 18px;
-  bottom: 20px;
-  z-index: 30;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
-}
-
-.music-fab {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 2px solid #ead09b;
-  background: #58372c;
-  color: #ffe5b1;
-  font-size: 29px;
-  box-shadow: 0 7px 20px #0007;
-}
-
-.music-panel {
-  width: min(300px, calc(100vw - 35px));
-  padding: 20px;
-  background: #f8ecd5;
-  border: 2px solid #b99466;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px #0006;
-}
-
-.music-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.song-title {
-  font-family: "Caveat", cursive;
-  font-size: 25px;
-  margin: 15px 0;
-}
-
-.music-controls {
-  display: flex;
-  justify-content: space-around;
-  gap: 6px;
-  margin: 14px 0;
-}
-
-.music-controls button {
-  background: #6b4536;
-  color: #fff0d5;
-  border: 0;
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  font-size: 18px;
-}
-
-.music-panel label {
-  display: block;
-  font-size: 12px;
-  margin: 10px 0 4px;
-}
-
-.music-panel input { width: 100%; }
-.music-panel .soft-btn { width: 100%; margin-top: 12px; }
-
-.playlist-list {
-  display: grid;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.playlist-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  border-bottom: 1px solid #d5b994;
-  padding: 10px 0;
-}
-
-.playlist-item span { overflow-wrap: anywhere; }
-.playlist-item button {
-  border: 0;
-  background: #ead2b8;
-  border-radius: 8px;
-  padding: 8px;
-}
-
-.toast {
-  position: fixed;
-  bottom: 90px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  max-width: 90%;
-  padding: 12px 20px;
-  border-radius: 20px;
-  background: #302019;
-  color: #fff0d7;
-  text-align: center;
-}
-
-.page-turn-next { animation: turnNext .5s ease; }
-.page-turn-prev { animation: turnPrev .5s ease; }
-
-@keyframes appear {
-  from { opacity: 0; transform: rotateY(-15deg) scale(.95); }
-  to { opacity: 1; transform: rotateY(0) scale(1); }
-}
-@keyframes heartbeat {
-  50% { transform: scale(1.13); }
-}
-@keyframes turnNext {
-  from { opacity: .4; transform: rotateY(-13deg); }
-  to { opacity: 1; transform: rotateY(0); }
-}
-@keyframes turnPrev {
-  from { opacity: .4; transform: rotateY(13deg); }
-  to { opacity: 1; transform: rotateY(0); }
-}
-
-@media (max-width: 600px) {
-  .paper { padding: 30px 22px 25px; min-height: 580px; }
-  .reader-header .brand { font-size: 21px; }
-  .paper-footer { font-size: 16px; }
-  .nav-btn { padding: 11px; font-size: 12px; }
-  .music-fab { width: 52px; height: 52px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
-  }
-}
-</style><script>
-"use strict";
-
+const SUPABASE_URL = "https://hwqccyftcaoqcmxmhdal.supabase.co";
+const SUPABASE_KEY = "sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let me=null, currentSession=null, currentGameData=null, selectedOption=null, pollHandle=null;
 const $ = id => document.getElementById(id);
+const GAME_TYPES=['Friendship Quiz','This or That','Tic Tac Toe','Word Scramble','Guess the Emoji'];
 
-const PAGE_KEY = "ourTalkDiariesPagesV2";
-const DIARY_KEY = "ourTalkDiariesMessagesV2";
-const SONG_KEY = "ourTalkDiariesSongsV2";
+function toast(message){const t=$('toast');t.textContent=message;t.style.display='block';setTimeout(()=>t.style.display='none',2800)}
+function show(id){['loginScreen','registerScreen','homeScreen','gameScreen'].forEach(x=>$(x).classList.toggle('hidden',x!==id))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function rpcError(e){return e?.message||String(e)}
+async function rpc(fn,args={}){const {data,error}=await db.rpc(fn,args);if(error)throw error;return data}
+async function portal(action,data={}){return rpc('little_portal',{p_action:action,p_data:data})}
+async function play(action,data={}){return rpc('little_play',{p_action:action,p_data:data})}
+async function ttt(action,data={}){return rpc('little_ttt',{p_action:action,p_data:data})}
+async function manage(action,data={}){return rpc('little_manage',{p_action:action,p_data:data})}
 
-// CHANGE THESE TO YOUR OWN PHOTO AND QUOTE
-const OPENING_PHOTO = "assets/photos/our-photo.jpg";
-const OPENING_QUOTE =
-  "In a world full of stories, you're my favourite chapter. ♡";
-
-const defaultPages = [
-  {
-    type: "opening",
-    title: "This Is Our Little World",
-    text: "",
-    mediaType: "photo",
-    mediaUrl: OPENING_PHOTO
-  },
-  {
-    type: "story",
-    title: "How Our Story Began",
-    text: "",
-    mediaType: "none",
-    mediaUrl: ""
-  },
-  {
-    type: "story",
-    title: "Our Love Story",
-    text: "",
-    mediaType: "none",
-    mediaUrl: ""
-  },
-  {
-    type: "story",
-    title: "What I Feel About You",
-    text: "",
-    mediaType: "none",
-    mediaUrl: ""
-  },
-  {
-    type: "story",
-    title: "Your Nature, Through My Eyes",
-    text: "",
-    mediaType: "none",
-    mediaUrl: ""
-  },
-  {
-    type: "story",
-    title: "Everything I Like About You",
-    text: "",
-    mediaType: "none",
-    mediaUrl: ""
-  },
-  {
-    type: "story",
-    title: "Who I Really Am",
-    text: "",
-    mediaType: "none",
-    mediaUrl: ""
-  },
-  {
-    type: "jokes",
-    title: "Five Reasons To Laugh With Me",
-    text: [
-      "Joke 1 -- Write something funny here.",
-      "Joke 2 -- Our funniest memory goes here.",
-      "Joke 3 -- A silly question for you.",
-      "Joke 4 -- Something only we understand.",
-      "Joke 5 -- One last joke before our diary."
-    ].join("\n---\n"),
-    mediaType: "none",
-    mediaUrl: ""
-  },
-  {
-    type: "diary",
-    title: "Our Never-Ending Talks",
-    text: "",
-    mediaType: "none",
-    mediaUrl: ""
+async function login(){
+ $('loginMessage').textContent='Signing in...';
+ try{
+  const {error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+  if(error)throw error;
+  await checkUser();
+ }catch(e){$('loginMessage').textContent=rpcError(e)}
+}
+async function logout(){
+ clearInterval(pollHandle);pollHandle=null;
+ await db.auth.signOut();me=null;currentSession=null;show('loginScreen');
+}
+async function checkUser(){
+ const {data:{session}}=await db.auth.getSession();
+ if(!session){show('loginScreen');return}
+ try{
+  const info=await rpc('little_me');
+  if(!info.registered){show('registerScreen');return}
+  me=info; $('playerName').textContent=me.display_name;show('homeScreen');await loadHome();
+ }catch(e){show('loginScreen');toast(rpcError(e))}
+}
+async function claimPlayer(name){
+ $('registerMessage').textContent='Saving...';
+ try{
+  await portal('claim_player',{display_name:name});
+  await checkUser();
+ }catch(e){$('registerMessage').textContent=rpcError(e)}
+}
+async function loadScores(){
+ const scores=await portal('get_scores');
+ $('scores').innerHTML=(scores||[]).map(s=>`<div class="score"><b>${esc(s.display_name)}</b><strong>${Number(s.points)||0} points</strong></div>`).join('')||'<p class="muted">No scores yet.</p>';
+}
+function gameEmoji(type){return {'Friendship Quiz':'🧠','This or That':'⚖️','Tic Tac Toe':'⭕','Word Scramble':'🔤','Guess the Emoji':'🤔'}[type]||'🎮'}
+async function loadHome(){
+ try{
+  await loadScores();
+  const sessions=await portal('list_sessions');
+  const active=(sessions||[]).filter(s=>s.status==='active');
+  const completed=(sessions||[]).filter(s=>s.status==='completed');
+  const root=$('sessions');
+  const render=(items,label)=>items.length?`<h3>${label}</h3>`+items.map(s=>`
+   <div class="session">
+    <div class="session-head"><b>${gameEmoji(s.game_type)} ${esc(s.game_type)}</b><span class="pill">${esc(s.status)}</span></div>
+    <p class="muted">Created ${new Date(s.created_at).toLocaleString()}</p>
+    <div class="actions"><button class="small" onclick="openGame('${s.id}')">Open / Resume</button>
+    <button class="danger small" onclick="clearById('${s.id}')">Clear</button></div>
+   </div>`).join(''):'';
+  root.innerHTML=render(active,'Active games')+render(completed,'Completed games')||'<p class="muted">No games yet. Choose a game above to start.</p>';
+ }catch(e){$('sessions').innerHTML=`<p class="error">${esc(rpcError(e))}</p>`}
+}
+async function newGame(type){
+ try{
+  const result=await portal('create_session',{game_type:type});
+  if(!result?.session_id)throw Error('The database did not return a game ID.');
+  await openGame(result.session_id);
+ }catch(e){toast(rpcError(e))}
+}
+async function openGame(id){
+ currentSession=id;selectedOption=null;show('gameScreen');
+ await refreshGame();
+ clearInterval(pollHandle);
+ pollHandle=setInterval(()=>{if(currentSession)refreshGame(true)},5000);
+}
+async function refreshGame(silent=false){
+ if(!currentSession)return;
+ try{
+  currentGameData=await portal('get_session',{session_id:currentSession});
+  renderGame();
+  if(!silent)toast('Game refreshed');
+ }catch(e){if(!silent)toast(rpcError(e))}
+}
+function isMyTurn(session){return session.current_turn_id===me.user_id}
+function getPending(questions){return (questions||[]).find(q=>q.status==='pending')}
+function renderGame(){
+ const data=currentGameData, s=data.session, questions=data.questions||[];
+ $('gameTitle').textContent=gameEmoji(s.game_type)+' '+s.game_type;
+ $('gameStatus').textContent=s.status;
+ const turn=isMyTurn(s);
+ $('gameInfo').textContent=s.status==='completed'?'This game is completed.':turn?'It is your turn.':'Waiting for the other player.';
+ const content=$('gameContent');
+ if(s.status==='cleared'){content.innerHTML='<p>This game has been cleared.</p>';return}
+ if(s.game_type==='Tic Tac Toe'){renderTtt(s,content);return}
+ const q=getPending(questions);
+ if(q){
+  const asker=q.asker_id===me.user_id;
+  content.innerHTML=`<div class="notice"><b>${asker?'Your question':'Question for you'}:</b><br>${esc(q.question)}${q.hint?`<br><span class="muted">Hint: ${esc(q.hint)}</span>`:''}</div>`;
+  if(asker){
+   content.innerHTML+=`<p class="muted">Waiting for the other player to answer.</p>`;
+  }else if(turn){
+   if(s.game_type==='Friendship Quiz'||s.game_type==='This or That'){
+    (q.options||[]).forEach((op,i)=>content.innerHTML+=`<button class="option" onclick="chooseOption(this,${i})">${esc(op)}</button>`);
+    content.innerHTML+=`<button onclick="submitSelected('${q.id}')">Submit answer</button>`;
+   }else{
+    content.innerHTML+=`<label>Your answer</label><input id="answerInput" placeholder="Type your answer" autocomplete="off"><button onclick="submitTextAnswer()">Submit answer</button>`;
+   }
+  }else{
+   content.innerHTML+='<p class="muted">Waiting for the other player.</p>';
   }
-];
-
-function load(key, fallback) {
-  try {
-    const data = JSON.parse(localStorage.getItem(key));
-    return Array.isArray(data)
-      ? data
-      : JSON.parse(JSON.stringify(fallback));
-  } catch {
-    return JSON.parse(JSON.stringify(fallback));
+ }else{
+  const latest=questions[questions.length-1];
+  if(latest&&latest.status!=='pending'){
+   content.innerHTML=`<div class="notice ${latest.is_correct?'success':'error'}">${latest.is_correct?'Correct answer! +10 points':'Wrong answer. −5 points'}<br>Correct answer: <b>${esc(latest.correct_answer||'')}</b></div>`;
   }
-}
-
-let pages = load(PAGE_KEY, defaultPages);
-let messages = load(DIARY_KEY, []);
-let songs = load(SONG_KEY, []);
-
-if (!pages.length) {
-  pages = JSON.parse(JSON.stringify(defaultPages));
-}
-
-let currentPage = 0;
-let currentSong = 0;
-let toastTimer;
-
-const audio = $("backgroundAudio");
-audio.volume = 0.6;
-
-function save(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch (error) {
-    console.error(error);
-    showToast("Could not save. Check browser storage.");
-    return false;
+  if(s.status==='active'&&turn){
+   content.innerHTML+=questionForm(s.game_type);
+  }else if(s.status==='active'){
+   content.innerHTML+='<p class="muted">Waiting for the other player to create the next question.</p>';
   }
+ }
 }
-
-function showToast(text) {
-  const el = $("toast");
-  el.textContent = text;
-  el.classList.remove("hidden");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    el.classList.add("hidden");
-  }, 2700);
+function chooseOption(btn,i){
+ selectedOption=i;document.querySelectorAll('.option').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');
 }
-
-function el(tag, className = "", text = "") {
-  const node = document.createElement(tag);
-  node.className = className;
-  node.textContent = text;
-  return node;
+function questionForm(type){
+ let html='<hr><h3>Your turn to ask ✨</h3><label>Question / clue</label><textarea id="questionText" placeholder="Write your question or clue"></textarea>';
+ if(type==='Friendship Quiz'||type==='This or That'){
+  const n=type==='Friendship Quiz'?4:2;
+  for(let i=0;i<n;i++)html+=`<label>Option ${i+1}</label><input id="opt${i}" placeholder="Option ${i+1}">`;
+  html+='<label>Correct option</label><select id="correctOption">';
+  for(let i=0;i<n;i++)html+=`<option value="${i}">Option ${i+1}</option>`;
+  html+='</select>';
+ }else if(type==='Word Scramble'){
+  html+='<label>Hint (optional)</label><input id="hintText" placeholder="Give a hint"><label>Correct word</label><input id="correctText" placeholder="Original word">';
+ }else{
+  html+='<label>Correct answer</label><input id="correctText" placeholder="What does the emoji mean?"><p class="muted">Put the emoji clue in the question box.</p>';
+ }
+ return html+'<button onclick="createQuestion()">Save question</button>';
 }
-
-function safeUrl(value) {
-  const url = String(value || "").trim();
-
-  if (/^https:\/\//i.test(url)) return url;
-
-  if (
-    url.startsWith("assets/") &&
-    !url.includes("..") &&
-    !url.includes("\\") &&
-    !url.includes("?") &&
-    !url.includes("#")
-  ) return url;
-
-  return "";
+function scramble(word){
+ const chars=word.split('');
+ for(let i=chars.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[chars[i],chars[j]]=[chars[j],chars[i]]}
+ if(chars.join('').toLowerCase()===word.toLowerCase()&&chars.length>1)chars.reverse();
+ return chars.join('');
 }
-
-function modal(id, visible) {
-  $(id).classList.toggle("hidden", !visible);
+async function createQuestion(){
+ const s=currentGameData.session,type=s.game_type;
+ let question=$('questionText')?.value.trim(),options=[],answer='',hint='';
+ if(!question){toast('Enter a question or clue.');return}
+ if(type==='Friendship Quiz'||type==='This or That'){
+  const n=type==='Friendship Quiz'?4:2;
+  options=Array.from({length:n},(_,i)=>$(`opt${i}`)?.value.trim()||'');
+  if(options.some(x=>!x)){toast('Fill all options.');return}
+  answer=options[Number($('correctOption').value)];
+ }else if(type==='Word Scramble'){
+  answer=$('correctText')?.value.trim()||'';
+  hint=$('hintText')?.value.trim()||'';
+  if(!answer){toast('Enter the correct word.');return}
+  question='Unscramble: '+scramble(answer);
+ }else{
+  answer=$('correctText')?.value.trim()||'';
+  if(!answer){toast('Enter the correct answer.');return}
+ }
+ try{
+  await play('create_question',{session_id:currentSession,question,options,correct_answer:answer,hint});
+  toast('Question saved!');await refreshGame(true);
+ }catch(e){toast(rpcError(e))}
 }
-
-document.querySelectorAll("[data-close]").forEach(button => {
-  button.addEventListener("click", () => {
-    modal(button.dataset.close, false);
-  });
+async function submitSelected(){
+ if(selectedOption===null){toast('Choose an option first.');return}
+ const q=getPending(currentGameData.questions);
+ await sendAnswer(q.options[selectedOption]);
+}
+async function submitTextAnswer(){
+ const answer=$('answerInput')?.value.trim();
+ if(!answer){toast('Enter your answer.');return}
+ await sendAnswer(answer);
+}
+async function sendAnswer(answer){
+ try{
+  const result=await play('submit_answer',{session_id:currentSession,answer});
+  toast(result.correct?'Correct! +10 points 🎉':'Not quite! −5 points');
+  selectedOption=null;await refreshGame(true);await loadScores();
+ }catch(e){toast(rpcError(e))}
+}
+function renderTtt(s,content){
+ const state=s.state||{},board=state.board||Array(9).fill('');
+ const x=state.x_player,o=state.o_player;
+ const symbol=me.user_id===x?'X':me.user_id===o?'O':(x?'O':'X');
+ content.innerHTML=`<p class="muted center">You are ${symbol}. ${isMyTurn(s)?'Your turn!':'Waiting for your turn.'}</p><div class="board">${Array.from({length:9},(_,i)=>`<button class="cell ${board[i]==='X'?'x':board[i]==='O'?'o':''}" ${s.status!=='active'||!isMyTurn(s)||board[i]?'disabled':''} onclick="tttMove(${i})">${esc(board[i]||'')}</button>`).join('')}</div>`;
+ if(s.status==='completed')content.innerHTML+='<p class="center success">Game completed!</p>';
+ if(s.status==='active')content.innerHTML+='<button class="secondary" onclick="resetTtt()">Reset board</button>';
+}
+async function tttMove(position){
+ try{await ttt('move',{session_id:currentSession,position});await refreshGame(true);await loadScores()}
+ catch(e){toast(rpcError(e))}
+}
+async function resetTtt(){
+ if(!confirm('Reset this board? No points will be awarded.'))return;
+ try{await ttt('reset',{session_id:currentSession});await refreshGame(true);toast('Board reset')}
+ catch(e){toast(rpcError(e))}
+}
+async function exitGame(){
+ try{await manage('exit',{session_id:currentSession})}catch(e){toast(rpcError(e));return}
+ clearInterval(pollHandle);pollHandle=null;currentSession=null;show('homeScreen');await loadHome();
+}
+async function clearGame(){
+ if(!confirm('Clear only this game? This cannot be undone.'))return;
+ await clearById(currentSession);
+}
+async function clearById(id){
+ if(id!==currentSession&&!confirm('Clear this selected game? This cannot be undone.'))return;
+ try{
+  await manage('clear',{session_id:id});
+  toast('Selected game cleared.');
+  if(id===currentSession){clearInterval(pollHandle);currentSession=null;show('homeScreen')}
+  await loadHome();
+ }catch(e){toast(rpcError(e))}
+}
+async function goHome(){
+ clearInterval(pollHandle);pollHandle=null;currentSession=null;show('homeScreen');await loadHome();
+}
+db.auth.onAuthStateChange((event,session)=>{
+ if(event==='SIGNED_OUT'){clearInterval(pollHandle);me=null;show('loginScreen')}
 });
-
-document.querySelectorAll(".modal").forEach(panel => {
-  panel.addEventListener("click", event => {
-    if (event.target === panel) {
-      panel.classList.add("hidden");
-    }
-  });
-});
-
-// BOOK NAVIGATION
-
-$("openBook").onclick = () => {
-  $("cover").classList.add("hidden");
-  $("reader").classList.remove("hidden");
-  renderPage();
-  window.scrollTo(0, 0);
-};
-
-$("closeBook").onclick = () => {
-  $("reader").classList.add("hidden");
-  $("cover").classList.remove("hidden");
-  window.scrollTo(0, 0);
-};
-
-$("nextPage").onclick = () => {
-  if (currentPage < pages.length - 1) {
-    currentPage++;
-    renderPage("next");
-  }
-};
-
-$("prevPage").onclick = () => {
-  if (currentPage > 0) {
-    currentPage--;
-    renderPage("prev");
-  }
-};
-
-function renderPage(direction = "") {
-  currentPage = Math.max(
-    0,
-    Math.min(currentPage, pages.length - 1)
-  );
-
-  const page = pages[currentPage];
-  const container = $("pageContent");
-  container.replaceChildren();
-
-  container.appendChild(
-    el(
-      "span",
-      "chapter-label",
-      page.type === "opening"
-        ? "THE BEGINNING OF US"
-        : `CHAPTER ${String(currentPage + 1).padStart(2, "0")}`
-    )
-  );
-
-  container.appendChild(el("h2", "", page.title));
-
-  if (page.type === "opening") {
-    const photoUrl = safeUrl(page.mediaUrl);
-
-    if (photoUrl) {
-      const img = el("img", "opening-photo");
-      img.src = photoUrl;
-      img.alt = "Our favourite photo";
-
-      img.onerror = () => {
-        img.replaceWith(
-          el("div", "photo-placeholder",
-            "♡ Add our photo here ♡")
-        );
-      };
-
-      container.appendChild(img);
-    } else {
-      container.appendChild(
-        el("div", "photo-placeholder", "♡ Our Photo ♡")
-      );
-    }
-
-    container.appendChild(
-      el("p", "love-quote", OPENING_QUOTE)
-    );
-  }
-
-  if (page.type === "jokes") {
-    const jokes = (page.text || "").split("\n---\n");
-
-    jokes.forEach((joke, index) => {
-      container.appendChild(
-        el("div", "joke-card",
-          `♡ ${index + 1}. ${joke.trim()}`)
-      );
-    });
-  } else if (page.text && page.text.trim()) {
-    container.appendChild(
-      el("p", "story-text", page.text)
-    );
-  } else if (page.type === "story") {
-    container.appendChild(
-      el("p", "placeholder",
-        "This page is waiting for your words... ♡")
-    );
-  }
-
-  if (page.type !== "opening" &&
-      page.type !== "diary") {
-    renderMedia(page, container);
-  }
-
-  if (page.type === "diary") {
-    container.appendChild(
-      el("p", "love-quote",
-        "Some conversations deserve to last forever. ♡")
-    );
-
-    const open = el("button", "gold-btn full",
-      "Open Our Talk Diaries 💌");
-
-    open.onclick = async () => {
-  await loadOnlineMessages();
-  modal("diaryModal", true);
-};
-    container.appendChild(open);
-
-    container.appendChild(
-      el("p", "placeholder",
-        `${messages.length} messages saved in this browser`)
-    );
-  }
-
-  $("pageNumber").textContent = currentPage + 1;
-  $("pageCount").textContent =
-    `${currentPage + 1} / ${pages.length}`;
-
-  $("prevPage").disabled = currentPage === 0;
-  $("nextPage").disabled =
-    currentPage === pages.length - 1;
-
-  $("editPage").disabled = page.type === "diary";
-  $("deletePage").disabled = page.type === "diary";
-
-  const paper = $("paper");
-  paper.classList.remove("page-turn-next", "page-turn-prev");
-
-  if (direction) {
-    void paper.offsetWidth;
-    paper.classList.add(
-      direction === "next"
-        ? "page-turn-next"
-        : "page-turn-prev"
-    );
-  }
-}
-
-function renderMedia(page, container) {
-  if (page.mediaType === "none") return;
-
-  const url = safeUrl(page.mediaUrl);
-  if (!url) return;
-
-  let media;
-
-  if (page.mediaType === "photo") {
-    media = el("img", "page-media");
-    media.alt = "Our memory";
-    media.loading = "lazy";
-  } else if (page.mediaType === "video") {
-    media = el("video", "page-media");
-    media.controls = true;
-    media.preload = "metadata";
-  } else {
-    return;
-  }
-
-  media.src = url;
-  container.appendChild(media);
-}
-
-// EDIT CHAPTERS
-let chapterChannel = null;
-let chapterLoadVersion = 0;
-let editorChapterId = null;
-
-function chapterFromRow(row) {
-  return {
-    id: row.id,
-    position: row.position,
-    type: row.type,
-    title: row.title,
-    text: row.text,
-    mediaType: row.media_type,
-    mediaUrl: row.media_url
-  };
-}
-
-async function loadOnlineChapters() {
-  const version = ++chapterLoadVersion;
-  const selectedId = pages[currentPage]?.id;
-
-  const { data, error } = await window.diaryDB
-    .from("diary_chapters")
-    .select("id,position,type,title,text,media_type,media_url")
-    .order("position", { ascending: true })
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    showToast("Loading failed: " + error.message);
-    return false;
-  }
-
-  if (version !== chapterLoadVersion) return true;
-
-  if (!data.length) {
-    showToast("No online chapters yet. Import them once.");
-    return false;
-  }
-
-  pages = data.map(chapterFromRow);
-
-  const selectedIndex = pages.findIndex(
-    p => p.id === selectedId
-  );
-
-  currentPage = selectedIndex >= 0
-    ? selectedIndex
-    : Math.min(currentPage, pages.length - 1);
-
-  renderPage();
-  return true;
-}
-
-function startChapterRealtime() {
-  if (chapterChannel) {
-    window.diaryDB.removeChannel(chapterChannel);
-  }
-
-  chapterChannel = window.diaryDB
-    .channel("our-book-chapters")
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "diary_chapters"
-      },
-      () => loadOnlineChapters()
-    )
-    .subscribe();
-}
-
-// IMPORT EXISTING LOCAL CHAPTERS — ONLY ONCE
-
-async function importMyExistingChapters() {
-  const local = load(PAGE_KEY, defaultPages);
-
-  if (!confirm(
-    `Import ${local.length} chapters to our shared book?`
-  )) return;
-
-  const { count, error: countError } = await window.diaryDB
-    .from("diary_chapters")
-    .select("id", { count: "exact", head: true });
-
-  if (countError) {
-    showToast(countError.message);
-    return;
-  }
-
-  if (count !== 0) {
-    showToast("Online chapters already exist.");
-    return;
-  }
-
-  const rows = local.map((p, i) => ({
-    position: (i + 1) * 1000,
-    type: p.type,
-    title: p.title,
-    text: p.text || "",
-    media_type: p.mediaType || "none",
-    media_url: p.mediaUrl || ""
-  }));
-
-  const { error } = await window.diaryDB
-    .from("diary_chapters")
-    .insert(rows);
-
-  if (error) {
-    showToast("Import failed: " + error.message);
-    return;
-  }
-
-  await loadOnlineChapters();
-  showToast("Chapters imported successfully ❤️");
-}
-
-// EDIT CHAPTER
-
-$("editPage").onclick = () => {
-  const page = pages[currentPage];
-
-  if (!page?.id || page.type === "diary") return;
-
-  editorChapterId = page.id;
-
-  $("chapterTitle").value = page.title;
-  $("chapterText").value = page.text;
-  $("mediaType").value = page.mediaType || "none";
-  $("mediaUrl").value = page.mediaUrl || "";
-
-  modal("editorModal", true);
-};
-
-// SAVE CHAPTER ONLINE
-
-$("savePage").onclick = async () => {
-  if (!editorChapterId) return;
-
-  const page = pages.find(
-    p => p.id === editorChapterId
-  );
-
-  if (!page || page.type === "diary") return;
-
-  const mediaType = $("mediaType").value;
-  const mediaUrl = $("mediaUrl").value.trim();
-
-  if (
-    mediaType !== "none" &&
-    mediaUrl &&
-    !safeUrl(mediaUrl)
-  ) {
-    showToast("Use HTTPS or an assets/ file path.");
-    return;
-  }
-
-  const button = $("savePage");
-  button.disabled = true;
-
-  const { error } = await window.diaryDB
-    .from("diary_chapters")
-    .update({
-      title: $("chapterTitle").value.trim() ||
-        "Our Untitled Chapter",
-      text: $("chapterText").value,
-      media_type: mediaType,
-      media_url: mediaUrl
-    })
-    .eq("id", editorChapterId);
-
-  button.disabled = false;
-
-  if (error) {
-    showToast("Save failed: " + error.message);
-    return;
-  }
-
-  modal("editorModal", false);
-  await loadOnlineChapters();
-
-  showToast("Chapter saved on both devices ❤️");
-};
-
-// ADD NEW CHAPTER
-
-$("addPage").onclick = async () => {
-  if (!pages[0]?.id) {
-    showToast("Import your chapters first.");
-    return;
-  }
-
-  const diary = pages.find(p => p.type === "diary");
-  const other = pages.filter(p => p.type !== "diary");
-
-  const position =
-    Math.max(0, ...other.map(p => p.position || 0)) + 1000;
-
-  const button = $("addPage");
-  button.disabled = true;
-
-  const { data, error } = await window.diaryDB
-    .from("diary_chapters")
-    .insert({
-      position,
-      type: "story",
-      title: "Our New Chapter",
-      text: "",
-      media_type: "none",
-      media_url: ""
-    })
-    .select("id")
-    .single();
-
-  if (!error && diary && diary.position <= position) {
-    const moved = await window.diaryDB
-      .from("diary_chapters")
-      .update({ position: position + 1000 })
-      .eq("id", diary.id);
-
-    if (moved.error) {
-      showToast("Chapter added, but diary order needs fixing.");
-    }
-  }
-
-  button.disabled = false;
-
-  if (error) {
-    showToast("Add failed: " + error.message);
-    return;
-  }
-
-  await loadOnlineChapters();
-
-  currentPage = pages.findIndex(p => p.id === data.id);
-  renderPage("next");
-
-  showToast("New chapter shared ✨");
-};
-
-// DELETE CHAPTER
-
-$("deletePage").onclick = async () => {
-  const page = pages.find(
-    p => p.id === editorChapterId
-  );
-
-  if (
-    !page ||
-    page.type === "opening" ||
-    page.type === "diary"
-  ) {
-    showToast("This special page cannot be deleted.");
-    return;
-  }
-
-  if (!confirm(
-    "Delete this chapter from BOTH devices permanently?"
-  )) return;
-
-  const button = $("deletePage");
-  button.disabled = true;
-
-  const { error } = await window.diaryDB
-    .from("diary_chapters")
-    .delete()
-    .eq("id", editorChapterId);
-
-  button.disabled = false;
-
-  if (error) {
-    showToast("Delete failed: " + error.message);
-    return;
-  }
-
-  editorChapterId = null;
-
-  modal("editorModal", false);
-  await loadOnlineChapters();
-
-  showToast("Chapter deleted from both devices.");
-};
-
-// OUR TALK DIARIES
-
-$("goDiary").onclick = async () => {
-  await loadOnlineMessages();
-  modal("diaryModal", true);
-};
-$("sendDiary").onclick = async () => {
-  const text = $("diaryText").value.trim();
-
-  if (!text) {
-    showToast("Write something first 💌");
-    return;
-  }
-
-  const { data: { user }, error: authError } =
-    await window.diaryDB.auth.getUser();
-
-  if (authError || !user) {
-    showToast("Please log in again.");
-    return;
-  }
-
-  const button = $("sendDiary");
-  button.disabled = true;
-
-  const { error } = await window.diaryDB
-    .from("diary_messages")
-    .insert({
-      user_id: user.id,
-      message: text
-    });
-
-  button.disabled = false;
-
-  if (error) {
-    console.error(error);
-    showToast("Save failed: " + error.message);
-    return;
-  }
-
-  $("diaryText").value = "";
-  await loadOnlineMessages();
-  showToast("Message saved online ❤️");
-};
-
-async function loadOnlineMessages() {
-  const { data, error } = await window.diaryDB
-    .from("diary_messages")
-    .select("id,user_id,message,created_at")
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    console.error(error);
-    showToast("Loading failed: " + error.message);
-    return;
-  }
-
-  messages = (data || []).map(row => ({
-    id: row.id,
-    userId: row.user_id,
-    author: row.user_id === currentUser?.id
-      ? "Me ♡"
-      : "My Favourite Person ♡",
-    text: row.message,
-    createdAt: row.created_at
-  }));
-
-  renderMessages();
-}  
-
-function renderMessages() {
-  const box = $("diaryMessages");
-  box.replaceChildren();
-
-  if (!messages.length) {
-    box.appendChild(
-      el("p", "muted",
-        "No messages yet. Start your first conversation ♡")
-    );
-    return;
-  }
-
-  messages.forEach(message => {
-    const card = el(
-      "div",
-      "diary-message" +
-      (message.userId === currentUser?.id ? " piyaaa" : "")
-    );
-
-    const author = el("strong", "", message.author);
-    const body = el("p", "", message.text);
-
-    const date = new Date(message.createdAt);
-    const time = el(
-      "small", "",
-      Number.isNaN(date.getTime())
-        ? ""
-        : date.toLocaleString()
-    );
-
-    card.append(author, body, time);
-    box.appendChild(card);
-  });
-
-  box.scrollTop = box.scrollHeight;
-}
-
-// FLOATING MUSIC PLAYER
-
-$("musicToggle").onclick = () => {
-  const panel = $("musicPanel");
-  panel.classList.toggle("hidden");
-
-  $("musicToggle").setAttribute(
-    "aria-expanded",
-    String(!panel.classList.contains("hidden"))
-  );
-};
-
-$("manageSongs").onclick = () => {
-  renderPlaylist();
-  modal("playlistModal", true);
-};
-
-function updateMusicUI() {
-  $("songPosition").textContent = songs.length
-    ? `${currentSong + 1} / ${songs.length}`
-    : "0 / 0";
-
-  $("songTitle").textContent = songs.length
-    ? songs[currentSong].name
-    : "No songs added";
-
-  $("playSong").textContent = audio.paused ? "▶" : "⏸";
-}
-
-async function playCurrentSong() {
-  if (!songs.length) {
-    showToast("Add your songs first 🎵");
-    return;
-  }
-
-  const url = safeUrl(songs[currentSong].url);
-
-  if (!url) {
-    showToast("Invalid song path.");
-    return;
-  }
-
-  if (audio.getAttribute("src") !== url) {
-    audio.src = url;
-  }
-
-  try {
-    await audio.play();
-  } catch {
-    showToast("Music could not play. Check the audio file.");
-  }
-
-  updateMusicUI();
-}
-
-$("playSong").onclick = async () => {
-  if (!audio.paused) {
-    audio.pause();
-    updateMusicUI();
-  } else {
-    await playCurrentSong();
-  }
-};
-
-$("nextSong").onclick = () => {
-  if (!songs.length) return;
-
-  currentSong = (currentSong + 1) % songs.length;
-  audio.pause();
-  audio.removeAttribute("src");
-  playCurrentSong();
-};
-
-$("previousSong").onclick = () => {
-  if (!songs.length) return;
-
-  currentSong =
-    (currentSong - 1 + songs.length) % songs.length;
-
-  audio.pause();
-  audio.removeAttribute("src");
-  playCurrentSong();
-};
-
-$("stopSong").onclick = () => {
-  audio.pause();
-  audio.currentTime = 0;
-  updateMusicUI();
-};
-
-$("volume").oninput = event => {
-  audio.volume = Number(event.target.value);
-};
-
-audio.addEventListener("ended", () => {
-  if (!songs.length) return;
-
-  currentSong = (currentSong + 1) % songs.length;
-  audio.removeAttribute("src");
-  playCurrentSong();
-});
-
-audio.addEventListener("play", updateMusicUI);
-audio.addEventListener("pause", updateMusicUI);
-audio.addEventListener("error", () => {
-  showToast("Audio file unavailable.");
-});
-
-// ADD / REMOVE SONGS
-
-$("addSong").onclick = () => {
-  const name = $("songName").value.trim();
-  const url = safeUrl($("songUrl").value);
-
-  if (!name || !url) {
-    showToast("Enter a song name and valid audio path.");
-    return;
-  }
-
-  songs.push({ name, url });
-
-  if (!save(SONG_KEY, songs)) {
-    songs.pop();
-    return;
-  }
-
-  $("songName").value = "";
-  $("songUrl").value = "";
-
-  renderPlaylist();
-  updateMusicUI();
-  showToast("Song added 🎵");
-};
-
-function renderPlaylist() {
-  const list = $("playlistList");
-  list.replaceChildren();
-
-  songs.forEach((song, index) => {
-    const item = el("div", "playlist-item");
-    const name = el("span", "", song.name);
-    const remove = el("button", "", "Remove");
-
-    remove.onclick = () => {
-      const removed = songs.splice(index, 1)[0];
-
-      if (!save(SONG_KEY, songs)) {
-        songs.splice(index, 0, removed);
-        return;
-      }
-
-      audio.pause();
-      audio.removeAttribute("src");
-
-      currentSong = Math.min(
-        currentSong,
-        Math.max(0, songs.length - 1)
-      );
-
-      renderPlaylist();
-      updateMusicUI();
-    };
-
-    item.append(name, remove);
-    list.appendChild(item);
-  });
-}
-
-// KEYBOARD CONTROLS
-
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape") {
-    document.querySelectorAll(".modal").forEach(m => {
-      m.classList.add("hidden");
-    });
-    return;
-  }
-
-  const anyModalOpen = [...document.querySelectorAll(".modal")]
-    .some(m => !m.classList.contains("hidden"));
-
-  if (
-    $("reader").classList.contains("hidden") ||
-    anyModalOpen ||
-    ["INPUT", "TEXTAREA", "SELECT"].includes(
-      document.activeElement.tagName
-    )
-  ) return;
-
-  if (event.key === "ArrowRight") $("nextPage").click();
-  if (event.key === "ArrowLeft") $("prevPage").click();
-});
-
-// START
-
-renderPage();
-updateMusicUI();
-  let currentUser = null;
-
-async function unlockBook(user) {
-  const { data, error } = await window.diaryDB
-    .from("diary_members")
-    .select("user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (error || !data) {
-    await window.diaryDB.auth.signOut();
-    throw new Error("This account is not approved.");
-  }
-
-  currentUser = user;
-  await loadOnlineChapters();
-  startChapterRealtime();
-  $("loginScreen").classList.add("hidden");
-  $("cover").classList.remove("hidden");
-}
-
-$("loginForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  $("loginError").textContent = "";
-
-  const email = $("loginEmail").value.trim();
-  const password = $("loginPassword").value;
-
-  const { data, error } =
-    await window.diaryDB.auth.signInWithPassword({
-      email,
-      password
-    });
-
-  if (error) {
-    $("loginError").textContent = error.message;
-    return;
-  }
-
-  try {
-    await unlockBook(data.user);
-    $("loginPassword").value = "";
-  } catch (err) {
-    $("loginError").textContent = err.message;
-  }
-});
-
-// Keep users logged in after refreshing
-async function restoreSession() {
-  const { data } = await window.diaryDB.auth.getUser();
-
-  if (data?.user) {
-    try {
-      await unlockBook(data.user);
-    } catch (err) {
-      $("loginError").textContent = err.message;
-    }
-
-
-
-  }
-}
-
-restoreSession();
+(async()=>{
+ const {data:{session}}=await db.auth.getSession();
+ if(session)await checkUser();else show('loginScreen');
+})();
 </script>
 </body>
 </html>
