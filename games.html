@@ -111,10 +111,13 @@ textarea{min-height:95px}
 <script>
 'use strict';
 
-const URL='https://hwqccyftcaoqcmxmhdal.supabase.co';
-const KEY='sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf';
-const client=window.supabase.createClient(URL,KEY);
+const SUPABASE_URL = "https://hwqccyftcaoqcmxmhdal.supabase.co";
+const SUPABASE_KEY = "sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf";
 
+const client = window.supabase.createClient(
+    SUPABASE_URL.trim(),
+    SUPABASE_KEY.trim()
+);
 const INFO=[
 ['Friendship Quiz','💌','Four-choice friendship questions'],
 ['Truth or Dare','🔥','Personal truth or funny dare'],
