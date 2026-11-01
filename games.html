@@ -151,7 +151,16 @@ async function openGame(id){
  currentSession=id;selectedOption=null;show('gameScreen');
  await refreshGame();
  clearInterval(pollHandle);
- pollHandle=setInterval(()=>{if(currentSession)refreshGame(true)},5000);
+ pollHandle=setInterval(()=>{
+  const active = document.activeElement;
+  const typing = active &&
+    $('gameContent').contains(active) &&
+    ['INPUT','TEXTAREA','SELECT'].includes(active.tagName);
+
+  if(currentSession && !typing){
+    refreshGame(true);
+  }
+},5000);
 }
 async function refreshGame(silent=false){
  if(!currentSession)return;
