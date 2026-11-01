@@ -10,7 +10,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <a href="games.html">🎮 Our Little Games ♡</a>
+  <a href="games.html" class="games-floating-btn">
+  🎮 Play Bestie Games ♡
+</a>
+
+<style>
+.games-floating-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 20px;
+  z-index: 99999;
+  padding: 14px 20px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #792e49, #bb7181);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 5px 20px rgba(0,0,0,.3);
+  animation: gamesPulse 2s infinite;
+}
+
+@keyframes gamesPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+</style>
 <section id="loginScreen" class="cover-screen">
   <div class="cover-book">
     <div class="ornament">✦ ❦ ✦</div>
