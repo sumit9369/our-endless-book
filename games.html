@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Our Little Games ♡</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--pink:#ff578e;--purple:#a777ff;--gold:#ffd478}
 *{box-sizing:border-box}
@@ -114,9 +114,13 @@ textarea{min-height:95px}
 const SUPABASE_URL = "https://hwqccyftcaoqcmxmhdal.supabase.co";
 const SUPABASE_KEY = "sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf";
 
+if (!window.supabase || !window.supabase.createClient) {
+    alert("Supabase library failed to load. Check your internet connection.");
+}
+
 const client = window.supabase.createClient(
-    SUPABASE_URL.trim(),
-    SUPABASE_KEY.trim()
+    SUPABASE_URL,
+    SUPABASE_KEY
 );
 const INFO=[
 ['Friendship Quiz','💌','Four-choice friendship questions'],
