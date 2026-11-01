@@ -7,7 +7,10 @@ let db,user,room,me,questions=[],answers=[],scores=[],poll,loading=false;
 function show(id,v){$(id).classList.toggle('hidden',!v)}function note(s){$('message').textContent=s;$('message').style.display='block';setTimeout(()=>$('message').style.display='none',5500)}
 async function get(q){const {data,error}=await q;if(error)throw error;return data}async function task(fn){if(loading)return;loading=true;try{await fn()}catch(e){note('Error: '+(e.message||e))}finally{loading=false}}
 function label(id){if(!id)return 'Waiting';return id===room?.player1_id?(room.player1_id===user.id?me:'Friend'):(room.player2_id===user.id?me:'Friend')}
-async function boot(){try{db=window.supabase.createClient(URL,KEY);const {data}=await db.auth.getUser();if(data.user)loggedIn(data.user)}catch(e){note('Supabase could not load: '+e.message)}}
+async function boot(){try{db=window.const db = window.supabase.createClient(
+  "https://hwqccyftcaoqcmxmhdal.supabase.co",
+  "sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf"
+);;const {data}=await db.auth.getUser();if(data.user)loggedIn(data.user)}catch(e){note('Supabase could not load: '+e.message)}}
 function loggedIn(u){user=u;show('loginCard',false);show('lobby',true);$('account').textContent='Signed in: '+u.email;const saved=localStorage.getItem('bestie-name-'+u.id);if(saved)$('player').value=saved;const savedRoom=localStorage.getItem('bestie-room-'+u.id);if(savedRoom){get(db.from('bestie_game_rooms').select('*').eq('id',savedRoom).maybeSingle()).then(r=>{if(r&&(r.player1_id===u.id||r.player2_id===u.id))enter(r)}).catch(()=>{})}}
 $('loginForm').onsubmit=e=>{e.preventDefault();task(async()=>{const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;loggedIn(data.user)})};
 $('logout').onclick=()=>task(async()=>{clearInterval(poll);await db.auth.signOut();room=null;user=null;show('roomView',false);show('lobby',false);show('loginCard',true)});
