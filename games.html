@@ -24,7 +24,7 @@ main{max-width:900px;margin:auto;padding:20px 14px 60px}header{text-align:center
 'use strict';
 const URL='https://hwqccyftcaoqcmxmhdal.supabase.co';
 const KEY='sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf';
-const client = window.supabase.createClient(https://hwqccyftcaoqcmxmhdal.supabase.co,sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf);
+const client = window.supabase.createClient('https://hwqccyftcaoqcmxmhdal.supabase.co','sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf');
 const INFO=[['Friendship Quiz','💌','Four-choice friendship questions'],['Truth or Dare','🔥','Personal truth or funny dare'],['This or That','💞','Pick one of two favourites'],['Tic Tac Toe','❌','Shared X and O board'],['Would You Rather','🤔','Choose a funny situation'],['Guess the Emoji','🧩','Guess a secret from emojis'],['Spin the Bottle','🍾','A random friendship challenge'],['Memory Match','🧠','Match cards across devices'],['Word Scramble','🔤','Solve your friend’s scrambled word'],['Connect Four','🔴','Drop four pieces in a row']];
 const $=id=>document.getElementById(id);let user=null,data=null,chosen=INFO[0][0],busy=false;
 function visible(id){['login','claim','app'].forEach(x=>$(x).classList.toggle('hidden',x!==id))}
