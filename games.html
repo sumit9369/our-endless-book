@@ -1,328 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Our Little Games ♡ | Piyaa & Babuchak</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <style>
-    :root { --ink:#493047; --pink:#b44978; --violet:#6750aa; --border:#e8dce7; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; color:var(--ink); font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif; background:linear-gradient(140deg,#fff0f6,#f1edff); }
-    main { max-width:850px; margin:auto; padding:18px 14px 70px; }
-    header { text-align:center; padding:20px 0; }
-    h1,h2 { font-family:Georgia,serif; }
-    h1 { font-size:clamp(2.4rem,7vw,4rem); margin:0; }
-    h2 { margin:0 0 12px; }
-    .muted { color:#846f80; }
-    .card { background:#ffffffed; border:1px solid var(--border); border-radius:22px; padding:22px; margin:14px 0; box-shadow:0 12px 30px #4b21440d; }
-    .hidden { display:none !important; }
-    label { display:block; font-weight:700; margin:12px 0 5px; }
-    input,select,textarea { display:block; width:100%; padding:12px; border:1px solid #d9c7d7; border-radius:12px; font:inherit; color:var(--ink); background:white; }
-    textarea { min-height:90px; resize:vertical; }
-    button { border:0; border-radius:12px; padding:12px 18px; font:inherit; font-weight:700; color:white; background:linear-gradient(110deg,var(--pink),var(--violet)); cursor:pointer; }
-    button:disabled { opacity:.5; cursor:not-allowed; }
-    button.secondary { color:var(--ink); background:#f1eaf3; }
-    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:15px; }
-    .actions button { flex:1; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:9px; }
-    .game { color:var(--ink); background:#fff6fb; border:1px solid #e4cfe1; text-align:left; min-height:65px; }
-    .game.active { outline:3px solid #bb79a5; }
-    .option { width:100%; margin:5px 0; color:var(--ink); background:#f5e9f3; text-align:left; border:1px solid #e6d3e2; }
-    .option.active { background:#ddc4ed; outline:2px solid var(--violet); }
-    .notice { background:#fff3da; padding:12px 15px; border-radius:12px; margin:12px 0; overflow-wrap:anywhere; }
-    .notice.error { background:#ffe5e5; color:#862b40; }
-    .notice.good { background:#e8f7ed; color:#246943; }
-    .row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-    .score { padding:12px; background:#f9f0fa; border-radius:12px; margin:8px 0; }
-    .history { border-top:1px solid var(--border); padding:12px 0; }
-    @media(max-width:550px) { .card { padding:16px; } }
-  </style>
-</head>
-<body>
-<main>
-  <header>
-    <div>✦ A LITTLE WORLD FOR TWO ✦</div>
-    <h1>Our Little Games ♡</h1>
-    <p>Piyaa ❤️ &amp; Babuchak 😃</p>
-    <p class="muted">Two friends • Two hearts • One little world ♡</p>
-  </header>
-
-  <div id="notice" class="notice hidden" role="status"></div>
-
-  <section id="loginView" class="card">
-    <h2>Our private little world 🔐</h2>
-    <p class="muted">Log in with your existing Supabase account.</p>
-    <form id="loginForm">
-      <label for="email">Email</label>
-      <input id="email" type="email" autocomplete="username" required>
-      <label for="password">Password</label>
-      <input id="password" type="password" autocomplete="current-password" required>
-      <div class="actions"><button type="submit">Log in ♡</button></div>
-    </form>
-  </section>
-
-  <section id="identityView" class="card hidden">
-    <div class="row"><h2>Who's playing? 💌</h2><button class="secondary" id="logout1">Log out</button></div>
-    <p id="identityEmail" class="muted"></p>
-    <p>Choose your name once. Each name is permanently linked to one login account.</p>
-    <label for="playerName">Your name</label>
-    <select id="playerName">
-      <option value="Piyaa">Piyaa ❤️</option>
-      <option value="Babuchak">Babuchak 😃</option>
-    </select>
-    <div class="actions"><button id="claimBtn">Continue ♡</button></div>
-  </section>
-
-  <section id="dashboard" class="hidden">
-    <div class="card">
-      <div class="row"><h2 id="welcome">Welcome ♡</h2><button class="secondary" id="logout2">Log out</button></div>
-      <p class="muted">No rooms. No room IDs. Play whenever you want.</p>
-      <div id="scores"></div>
-      <div class="actions"><button class="secondary" id="refreshBtn">Refresh questions</button></div>
-    </div>
-
-    <div id="waitingCard" class="card hidden">
-      <h2>Waiting for your friend 💌</h2>
-      <p id="waitingText"></p>
-    </div>
-
-    <div id="askCard" class="card hidden">
-      <h2>Your turn to ask ✍️</h2>
-      <p class="muted">Choose a game mode. Write one question and four possible answers.</p>
-      <div class="grid" id="gameGrid"></div>
-      <form id="askForm">
-        <label for="question">Your tricky question</label>
-        <textarea id="question" maxlength="1000" required placeholder="Write your question here..."></textarea>
-        <label for="option0">Option A</label><input id="option0" maxlength="250" required>
-        <label for="option1">Option B</label><input id="option1" maxlength="250" required>
-        <label for="option2">Option C</label><input id="option2" maxlength="250" required>
-        <label for="option3">Option D</label><input id="option3" maxlength="250" required>
-        <label for="correct">Correct answer (hidden until answered)</label>
-        <select id="correct"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
-        <div class="actions"><button type="submit">Save question for my friend ♡</button></div>
-      </form>
-    </div>
-
-    <div id="answerCard" class="card hidden">
-      <h2>Question waiting for you 💌</h2>
-      <p id="questionGame" class="muted"></p>
-      <h3 id="questionText"></h3>
-      <div id="answerOptions"></div>
-      <div class="actions"><button id="answerBtn" disabled>Submit answer</button></div>
-    </div>
-
-    <div class="card">
-      <h2>Previous questions 📖</h2>
-      <div id="history" class="muted">No completed questions yet.</div>
-    </div>
-  </section>
-</main>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Our Little Games ♡ | Piyaa & Babuchak</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{--ink:#fff4ff;--pink:#ef6f9d;--violet:#9e80ff;--border:#ffffff33}*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);font:16px/1.5 system-ui,sans-serif;background:radial-gradient(circle at 10% 10%,#7c245c,transparent 45%),radial-gradient(circle at 90% 20%,#5139a5,transparent 50%),#1c102e}main{max-width:920px;margin:auto;padding:16px 14px 70px}header{text-align:center;padding:24px 0}h1,h2{font-family:Georgia,serif}h1{font-size:clamp(2.4rem,8vw,4.4rem);margin:0;background:linear-gradient(100deg,#fff,#ffb2d0,#bcaaff);background-clip:text;color:transparent}h2{margin:0 0 12px}.muted{color:#ddc8e8}.card{background:#ffffff12;backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:22px;padding:20px;margin:14px 0;box-shadow:0 12px 35px #0002}.hidden{display:none!important}label{display:block;font-weight:700;margin:12px 0 5px}input,select,textarea{display:block;width:100%;padding:12px;border:1px solid #d9c7d7;border-radius:12px;font:inherit;color:#30203f;background:#fff}textarea{min-height:90px;resize:vertical}button{border:0;border-radius:13px;padding:12px 17px;font:inherit;font-weight:700;color:#fff;background:linear-gradient(110deg,#d9437b,#7254c9);cursor:pointer;touch-action:manipulation}button:disabled{opacity:.5;cursor:not-allowed}button.secondary{color:#fff;background:#ffffff27;border:1px solid #ffffff44}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}.actions button{flex:1}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.game{background:linear-gradient(145deg,#74396f,#493c91);border:1px solid #ffffff4d;text-align:center;min-height:112px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:transform .2s}.game:active{transform:scale(.96)}.emoji{font-size:30px}.option{width:100%;margin:5px 0;color:#fff;background:#ffffff1e;text-align:left;border:1px solid #ffffff44}.option.active{background:#7950a8;outline:2px solid #e5b6ff}.notice{background:#5e365e;padding:12px 15px;border-radius:12px;margin:12px 0;overflow-wrap:anywhere}.notice.error{background:#802e47}.notice.good{background:#25694f}.row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}.score{padding:12px;background:#ffffff19;border-radius:12px;margin:8px 0}.history{border-top:1px solid var(--border);padding:12px 0}.board3{display:grid;grid-template-columns:repeat(3,80px);gap:7px;justify-content:center;margin:20px 0}.board3 button{height:80px;font-size:34px;background:#ffffff24}.board7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;max-width:440px;margin:18px auto}.board7 button{padding:0;aspect-ratio:1;border-radius:50%;background:#ffffff25;border:2px solid #ffffff55}.board7 .red{background:#ff668b}.board7 .yellow{background:#f9cb56}.memory{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:410px;margin:18px auto}.memory button{height:72px;font-size:27px;background:#ffffff26}.memory .found{background:#2d805e}.center{text-align:center}.big{font-size:55px;padding:25px 0}.pill{display:inline-block;padding:6px 12px;border-radius:40px;background:#ffffff25;margin:3px}.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice-grid button{min-height:85px}#miniStatus{font-weight:700;text-align:center;min-height:25px}@media(max-width:550px){.card{padding:15px}.board3{grid-template-columns:repeat(3,72px)}.board3 button{height:72px}.game{min-height:105px}}
+</style></head><body><main><header><div>✦ A LITTLE WORLD FOR TWO ✦</div><h1>Our Little Games ♡</h1><p>Piyaa ❤️ &amp; Babuchak 😃</p><p class="muted">Ten games • Two friends • Endless fun ✨</p></header><div id="notice" class="notice hidden" role="status"></div>
+<section id="loginView" class="card"><h2>Our private little world 🔐</h2><p class="muted">Log in with your existing Supabase account.</p><form id="loginForm"><label>Email</label><input id="email" type="email" autocomplete="username" required><label>Password</label><input id="password" type="password" autocomplete="current-password" required><div class="actions"><button type="submit">Log in ♡</button></div></form></section>
+<section id="identityView" class="card hidden"><div class="row"><h2>Who's playing? 💌</h2><button class="secondary" id="logout1">Log out</button></div><p id="identityEmail" class="muted"></p><p>Choose your name once. Each name is linked to one login account.</p><label>Your name</label><select id="playerName"><option value="Piyaa">Piyaa ❤️</option><option value="Babuchak">Babuchak 😃</option></select><div class="actions"><button id="claimBtn">Continue ♡</button></div></section>
+<section id="dashboard" class="hidden"><div class="card"><div class="row"><h2 id="welcome">Welcome ♡</h2><button class="secondary" id="logout2">Log out</button></div><p class="muted">Choose any game. Online question games sync across devices. Mini-games play on this device.</p><div id="scores"></div><div class="actions"><button class="secondary" id="refreshBtn">Refresh online questions</button></div></div>
+<div id="menuCard" class="card"><h2>🎮 Choose a game</h2><div id="gameGrid" class="grid"></div></div>
+<div id="miniCard" class="card hidden"><div class="row"><h2 id="miniTitle">Game</h2><button class="secondary" id="backBtn">← All games</button></div><p id="miniHint" class="muted"></p><p id="miniStatus"></p><div id="miniArea"></div><div class="actions"><button id="restartBtn" class="secondary">Play again ↻</button></div></div>
+<div id="onlineCard" class="hidden"><div class="card"><div class="row"><h2 id="onlineTitle">Online question game</h2><button class="secondary" id="backOnline">← All games</button></div><p class="muted">Ask on one phone; answer later on the other. No rooms needed.</p></div><div id="waitingCard" class="card hidden"><h2>Waiting for your friend 💌</h2><p id="waitingText"></p></div><div id="askCard" class="card hidden"><h2>Your turn to ask ✍️</h2><form id="askForm"><label>Your question</label><textarea id="question" maxlength="1000" required></textarea><label>Option A</label><input id="option0" maxlength="250" required><label>Option B</label><input id="option1" maxlength="250" required><label>Option C</label><input id="option2" maxlength="250" required><label>Option D</label><input id="option3" maxlength="250" required><label>Correct answer</label><select id="correct"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select><div class="actions"><button type="submit">Save question for my friend ♡</button></div></form></div><div id="answerCard" class="card hidden"><h2>Question waiting for you 💌</h2><p id="questionGame" class="muted"></p><h3 id="questionText"></h3><div id="answerOptions"></div><div class="actions"><button id="answerBtn" disabled>Submit answer</button></div></div><div class="card"><h2>Previous questions 📖</h2><div id="history" class="muted">No completed questions yet.</div></div></div></section></main>
 <script>
-  'use strict';
-
-  // Your existing public Supabase project URL and publishable key.
-  // Do NOT add /rest/v1/ to the project URL.
-  const SUPABASE_URL = 'https://hwqccyftcaoqcmxmhdal.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf';
-
-  const GAMES = [
-    'Friendship Quiz', 'Truth or Dare', 'This or That', 'Tic Tac Toe',
-    'Would You Rather', 'Guess the Emoji', 'Spin the Bottle',
-    'Memory Match', 'Word Scramble', 'Connect Four'
-  ];
-
-  const $ = id => document.getElementById(id);
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  let user = null;
-  let snapshot = null;
-  let selectedGame = GAMES[0];
-  let selectedAnswer = null;
-  let busy = false;
-
-  function show(view) {
-    ['loginView','identityView','dashboard'].forEach(id => $(id).classList.toggle('hidden',id !== view));
-  }
-
-  function notice(message, type='') {
-    const el = $('notice');
-    el.textContent = message;
-    el.className = 'notice ' + type;
-    el.classList.remove('hidden');
-  }
-
-  function clearNotice() { $('notice').classList.add('hidden'); }
-
-  function element(tag, text, className) {
-    const node = document.createElement(tag);
-    if (text !== undefined) node.textContent = text;
-    if (className) node.className = className;
-    return node;
-  }
-
-  async function rpc(name, params={}) {
-    const { data, error } = await db.rpc(name, params);
-    if (error) throw new Error(error.message);
-    return data;
-  }
-
-  async function load() {
-    snapshot = await rpc('bestie_async_snapshot');
-    if (!snapshot.me) {
-      $('identityEmail').textContent = 'Signed in: ' + user.email;
-      show('identityView');
-    } else {
-      show('dashboard');
-      render();
-    }
-  }
-
-  async function execute(fn) {
-    if (busy) return;
-    busy = true;
-    try { clearNotice(); await fn(); }
-    catch (err) { notice(err.message || String(err), 'error'); }
-    finally { busy = false; }
-  }
-
-  function renderGames() {
-    const grid = $('gameGrid');
-    grid.replaceChildren();
-    GAMES.forEach(name => {
-      const btn = element('button', name, 'game' + (name === selectedGame ? ' active' : ''));
-      btn.type = 'button';
-      btn.onclick = () => { selectedGame = name; renderGames(); };
-      grid.append(btn);
-    });
-  }
-
-  function render() {
-    const players = snapshot.players || [];
-    const me = players.find(p => p.id === user.id);
-    const asker = players.find(p => p.id === snapshot.asker_id);
-    const active = (snapshot.questions || []).find(q => q.id === snapshot.active_question_id);
-    $('welcome').textContent = 'Hello, ' + (me?.name || snapshot.me) + ' ♡';
-    const scores = $('scores');
-    scores.replaceChildren();
-    players.forEach(p => scores.append(element('div', p.name + ' — ' + p.points + ' points · ✓ ' + p.correct + ' · ✗ ' + p.wrong, 'score')));
-
-    const both = players.length === 2;
-    const canAsk = both && !active && snapshot.asker_id === user.id;
-    const canAnswer = both && active && active.creator_id !== user.id;
-    $('askCard').classList.toggle('hidden', !canAsk);
-    $('answerCard').classList.toggle('hidden', !canAnswer);
-    $('waitingCard').classList.toggle('hidden', canAsk || canAnswer);
-
-    if (!both) $('waitingText').textContent = 'Waiting for your friend to log in and choose their name for the first time.';
-    else if (active) $('waitingText').textContent = 'Your question is saved. Your friend can answer whenever they log in.';
-    else $('waitingText').textContent = 'Waiting for ' + (asker?.name || 'your friend') + ' to create the next question.';
-
-    if (canAsk) renderGames();
-    if (canAnswer) {
-      selectedAnswer = null;
-      $('answerBtn').disabled = true;
-      $('questionGame').textContent = active.game;
-      $('questionText').textContent = active.text;
-      const options = $('answerOptions');
-      options.replaceChildren();
-      (active.options || []).forEach((answer, index) => {
-        const btn = element('button', String.fromCharCode(65+index) + '. ' + answer, 'option');
-        btn.onclick = () => {
-          selectedAnswer = index;
-          options.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          $('answerBtn').disabled = false;
-        };
-        options.append(btn);
-      });
-    }
-
-    const history = $('history');
-    history.replaceChildren();
-    const completed = (snapshot.questions || []).filter(q => q.answered_at);
-    if (!completed.length) history.textContent = 'No completed questions yet.';
-    completed.forEach(q => {
-      const creator = players.find(p => p.id === q.creator_id)?.name || 'Friend';
-      const responder = players.find(p => p.id === q.answered_by)?.name || 'Friend';
-      const box = element('div', undefined, 'history');
-      box.append(element('strong', q.game + ' · ' + creator + ' asked'));
-      box.append(element('p', q.text));
-      box.append(element('p', responder + ' answered: ' + (q.options?.[q.answer_index] || '') + (q.is_correct ? ' ✅ +10' : ' ❌ -5')));
-      box.append(element('p', 'Correct answer: ' + (q.options?.[q.correct_index] || '')));
-      history.append(box);
-    });
-  }
-
-  $('loginForm').addEventListener('submit', event => {
-    event.preventDefault();
-    execute(async () => {
-      const {data,error} = await db.auth.signInWithPassword({
-        email:$('email').value.trim(), password:$('password').value
-      });
-      if (error) throw error;
-      user = data.user;
-      $('password').value = '';
-      await load();
-    });
-  });
-
-  $('claimBtn').onclick = () => execute(async () => {
-    await rpc('bestie_async_claim', {p_name:$('playerName').value});
-    await load();
-  });
-
-  async function logout() {
-    await db.auth.signOut();
-    user = null;
-    snapshot = null;
-    show('loginView');
-    clearNotice();
-  }
-  $('logout1').onclick = () => execute(logout);
-  $('logout2').onclick = () => execute(logout);
-  $('refreshBtn').onclick = () => execute(load);
-
-  $('askForm').addEventListener('submit', event => {
-    event.preventDefault();
-    execute(async () => {
-      const options = [0,1,2,3].map(i => $('option'+i).value.trim());
-      if (options.some(x => !x)) throw new Error('Fill in all four options.');
-      await rpc('bestie_async_ask', {
-        p_game:selectedGame,
-        p_question:$('question').value.trim(),
-        p_options:options,
-        p_correct:Number($('correct').value)
-      });
-      $('askForm').reset();
-      await load();
-      notice('Question saved! Your friend can answer later.', 'good');
-    });
-  });
-
-  $('answerBtn').onclick = () => execute(async () => {
-    if (selectedAnswer === null) throw new Error('Choose an answer first.');
-    const id = snapshot.active_question_id;
-    const result = await rpc('bestie_async_answer', {p_question_id:id,p_index:selectedAnswer});
-    await load();
-    notice(result.correct ? 'Correct! +10 points. Your turn to ask!' : 'Wrong answer. -5 points. Your friend asks again.', result.correct ? 'good' : 'error');
-  });
-
-  async function boot() {
-    try {
-      if (!window.supabase) throw new Error('Supabase library could not load. Check your internet connection.');
-      const {data,error} = await db.auth.getUser();
-      if (error && !/session missing/i.test(error.message)) throw error;
-      user = data?.user || null;
-      if (user) await load();
-      else show('loginView');
-    } catch(err) {
-      notice(err.message + ' — Run the new async-games SQL setup if you have not done so.', 'error');
-      show(user ? 'identityView' : 'loginView');
-    }
-  }
-  boot();
-  // Periodically refresh while the page is open. It also works when reopened later.
-  setInterval(() => { if (user && snapshot?.me && !busy && document.visibilityState === 'visible') load().catch(()=>{}); }, 20000);
-</script>
-</body>
-</html>
+'use strict';
+const SUPABASE_URL='https://hwqccyftcaoqcmxmhdal.supabase.co';
+const SUPABASE_KEY='sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf';
+const GAMES=[['Friendship Quiz','💌','online'],['Truth or Dare','🔥','local'],['This or That','💞','local'],['Tic Tac Toe','❌','local'],['Would You Rather','🤔','local'],['Guess the Emoji','🧩','local'],['Spin the Bottle','🍾','local'],['Memory Match','🧠','local'],['Word Scramble','🔤','local'],['Connect Four','🔴','local']];
+const $=id=>document.getElementById(id);let db,user=null,snapshot=null,busy=false,selectedAnswer=null,mode='menu',gameName='',resetMini=()=>{},lastQuestionId=null;
+function show(view){['loginView','identityView','dashboard'].forEach(id=>$(id).classList.toggle('hidden',id!==view))}
+function notice(message,type=''){const el=$('notice');el.textContent=message;el.className='notice '+type;el.classList.remove('hidden')}
+function clearNotice(){$('notice').classList.add('hidden')}
+function element(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n}
+async function rpc(name,params={}){const {data,error}=await db.rpc(name,params);if(error)throw new Error(error.message);return data}
+async function execute(fn){if(busy)return;busy=true;try{clearNotice();await fn()}catch(e){notice(e.message||String(e),'error')}finally{busy=false}}
+async function load(){snapshot=await rpc('bestie_async_snapshot');if(!snapshot.me){$('identityEmail').textContent='Signed in: '+user.email;show('identityView')}else{show('dashboard');render()}}
+function menu(){mode='menu';$('menuCard').classList.remove('hidden');$('miniCard').classList.add('hidden');$('onlineCard').classList.add('hidden');clearNotice()}
+function openGame(name,type){gameName=name;$('menuCard').classList.add('hidden');$('onlineCard').classList.toggle('hidden',type!=='online');$('miniCard').classList.toggle('hidden',type==='online');mode=type;if(type==='online'){$('onlineTitle').textContent=name;renderOnline()}else{startMini(name)}window.scrollTo({top:0,behavior:'smooth'})}
+function renderGames(){const grid=$('gameGrid');grid.replaceChildren();GAMES.forEach(([name,emoji,type])=>{const b=element('button',undefined,'game');b.type='button';b.append(element('span',emoji,'emoji'),element('span',name));b.onclick=()=>openGame(name,type);grid.append(b)})}
+function render(){const players=snapshot.players||[],me=players.find(p=>p.id===user.id);$('welcome').textContent='Hello, '+(me?.name||snapshot.me)+' ♡';const scores=$('scores');scores.replaceChildren();players.forEach(p=>scores.append(element('div',p.name+' — '+p.points+' points · ✓ '+p.correct+' · ✗ '+p.wrong,'score')));if(mode==='online')renderOnline()}
+function renderOnline(){if(!snapshot)return;const players=snapshot.players||[],asker=players.find(p=>p.id===snapshot.asker_id),active=(snapshot.questions||[]).find(q=>q.id===snapshot.active_question_id),both=players.length===2,canAsk=both&&!active&&snapshot.asker_id===user.id,canAnswer=both&&active&&active.creator_id!==user.id;$('askCard').classList.toggle('hidden',!canAsk);$('answerCard').classList.toggle('hidden',!canAnswer);$('waitingCard').classList.toggle('hidden',canAsk||canAnswer);$('waitingText').textContent=!both?'Waiting for your friend to log in and choose their name.':active?'Your question is saved. Your friend can answer later.':'Waiting for '+(asker?.name||'your friend')+' to ask.';if(canAnswer){if(lastQuestionId!==active.id){selectedAnswer=null;lastQuestionId=active.id}$('answerBtn').disabled=selectedAnswer===null;$('questionGame').textContent=active.game;$('questionText').textContent=active.text;const area=$('answerOptions');area.replaceChildren();(active.options||[]).forEach((a,i)=>{const b=element('button',String.fromCharCode(65+i)+'. '+a,'option'+(selectedAnswer===i?' active':''));b.onclick=()=>{selectedAnswer=i;renderOnline()};area.append(b)})}const history=$('history');history.replaceChildren();const completed=(snapshot.questions||[]).filter(q=>q.answered_at);if(!completed.length)history.textContent='No completed questions yet.';completed.forEach(q=>{const creator=players.find(p=>p.id===q.creator_id)?.name||'Friend',responder=players.find(p=>p.id===q.answered_by)?.name||'Friend',box=element('div',undefined,'history');box.append(element('strong',q.game+' · '+creator+' asked'),element('p',q.text),element('p',responder+' answered: '+(q.options?.[q.answer_index]||'')+(q.is_correct?' ✅ +10':' ❌ -5')),element('p','Correct answer: '+(q.options?.[q.correct_index]||'')));history.append(box)})}
+$('loginForm').addEventListener('submit',e=>{e.preventDefault();execute(async()=>{const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;user=data.user;$('password').value='';await load()})});$('claimBtn').onclick=()=>execute(async()=>{await rpc('bestie_async_claim',{p_name:$('playerName').value});await load()});async function logout(){await db.auth.signOut();user=null;snapshot=null;mode='menu';show('loginView');clearNotice()}$('logout1').onclick=()=>execute(logout);$('logout2').onclick=()=>execute(logout);$('refreshBtn').onclick=()=>execute(load);$('backBtn').onclick=menu;$('backOnline').onclick=menu;$('restartBtn').onclick=()=>resetMini();
+$('askForm').addEventListener('submit',e=>{e.preventDefault();execute(async()=>{const options=[0,1,2,3].map(i=>$('option'+i).value.trim());if(options.some(x=>!x))throw Error('Fill in all four options.');await rpc('bestie_async_ask',{p_game:gameName,p_question:$('question').value.trim(),p_options:options,p_correct:Number($('correct').value)});$('askForm').reset();await load();notice('Question saved! Your friend can answer later.','good')})});$('answerBtn').onclick=()=>execute(async()=>{if(selectedAnswer===null)throw Error('Choose an answer first.');const result=await rpc('bestie_async_answer',{p_question_id:snapshot.active_question_id,p_index:selectedAnswer});selectedAnswer=null;lastQuestionId=null;await load();notice(result.correct?'Correct! +10 points. Your turn to ask!':'Wrong answer. -5 points. Your friend asks again.',result.correct?'good':'error')});
+function area(){const a=$('miniArea');a.replaceChildren();$('miniStatus').textContent='';return a}function addButton(parent,text,fn,cls=''){const b=element('button',text,cls);b.type='button';b.onclick=fn;parent.append(b);return b}function status(s){$('miniStatus').textContent=s}function choose(arr){return arr[Math.floor(Math.random()*arr.length)]}function section(text){return element('p',text,'center')}
+const truths=['What was your first impression of me?','What is your funniest memory with me?','What is one secret talent you have?','What is the most embarrassing thing you have done?','Which moment of our friendship would you replay?','What is one thing you never told me?'];const dares=['Send your funniest selfie!','Sing a song for 15 seconds.','Do a funny dance.','Imitate your friend for 20 seconds.','Say three nice things about your friend.','Make a silly face for a photo.'];const pairs=[['Late-night talks 🌙','Morning adventures ☀️'],['Pizza 🍕','Burger 🍔'],['Beach 🏖️','Mountains 🏔️'],['Movie night 🎬','Game night 🎮'],['Texting 💬','Calling 📞'],['Sweet 🍬','Spicy 🌶️']];const rather=[['Travel to the past','Travel to the future'],['Be invisible','Read minds'],['Never use social media','Never watch movies'],['Have unlimited pizza','Have unlimited ice cream'],['Live by the sea','Live in the mountains']];const emojiQuestions=[['🍕❤️','Pizza lover'],['🌧️🐱🐶','Raining cats and dogs'],['🦁👑','Lion King'],['❄️👸','Frozen'],['🕷️👨','Spider Man'],['🌙🚶','Moonwalk'],['🍎📱','Apple phone']];const words=['FRIEND','MEMORY','LAUGHTER','SECRET','SMILE','HAPPINESS','ADVENTURE','CHOCOLATE'];
+function startMini(name){$('miniTitle').textContent=name;const hints={'Truth or Dare':'Take turns on the same phone. Pick Truth or Dare!','This or That':'Pick your favourite and pass the phone.','Tic Tac Toe':'Two players on one phone: X goes first.','Would You Rather':'Choose your favourite. There are no wrong answers.','Guess the Emoji':'Guess the phrase or title from emojis.','Spin the Bottle':'Put the phone between friends and spin!','Memory Match':'Flip two cards and find all matching pairs.','Word Scramble':'Unscramble the word using the letters.','Connect Four':'Two players on one phone. Connect four discs to win.'};$('miniHint').textContent=hints[name]||'';resetMini=()=>{if(name==='Truth or Dare')truthDare();else if(name==='This or That')binary(pairs);else if(name==='Would You Rather')binary(rather);else if(name==='Tic Tac Toe')ticTacToe();else if(name==='Guess the Emoji')guessEmoji();else if(name==='Spin the Bottle')spinBottle();else if(name==='Memory Match')memory();else if(name==='Word Scramble')scramble();else if(name==='Connect Four')connectFour()};resetMini()}
+function truthDare(){const a=area();let count=0;const result=element('div','Choose your challenge!','big center');a.append(result);const row=element('div',undefined,'actions');a.append(row);addButton(row,'Truth 💌',()=>{result.textContent=choose(truths);status('Challenge '+(++count)+' · Pass the phone after answering')});addButton(row,'Dare 🔥',()=>{result.textContent=choose(dares);status('Challenge '+(++count)+' · Pass the phone after completing')})}
+function binary(items){const a=area();let i=0;const question=element('p','','center');const choices=element('div',undefined,'choice-grid');a.append(question,choices);function draw(){choices.replaceChildren();question.textContent='Round '+(i+1)+' of '+items.length;items[i].forEach(choice=>addButton(choices,choice,()=>{status('You chose: '+choice);i=(i+1)%items.length;setTimeout(()=>{if(mode==='local')draw()},700)}))}draw()}
+function ticTacToe(){const a=area(),board=Array(9).fill('');let turn='X',over=false;const grid=element('div',undefined,'board3');a.append(grid);function win(){const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];return lines.some(line=>line.every(i=>board[i]===turn))}function draw(){grid.replaceChildren();board.forEach((v,i)=>addButton(grid,v||'·',()=>{if(over||board[i])return;board[i]=turn;if(win()){over=true;status(turn+' wins! 🎉')}else if(board.every(Boolean)){over=true;status('It’s a draw!')}else{turn=turn==='X'?'O':'X';status(turn+'’s turn')}draw()}))}status('X’s turn');draw()}
+function guessEmoji(){const a=area();let i=0,score=0;const q=element('div','','big center'),input=element('input'),answer=element('p','','center'),controls=element('div',undefined,'actions');input.placeholder='Your guess';a.append(q,input,answer,controls);function draw(){q.textContent=emojiQuestions[i][0];input.value='';answer.textContent='';status('Question '+(i+1)+' / '+emojiQuestions.length+' · Score '+score)}addButton(controls,'Check answer',()=>{const correct=emojiQuestions[i][1];if(input.value.trim().toLowerCase().replace(/\s/g,'')===correct.toLowerCase().replace(/\s/g,'')){score++;answer.textContent='Correct! 🎉'}else answer.textContent='Answer: '+correct;status('Score: '+score)});addButton(controls,'Next →',()=>{i=(i+1)%emojiQuestions.length;draw()},'secondary');draw()}
+function spinBottle(){const a=area(),b=element('div','🍾','big center');b.style.transition='transform 1.8s ease-out';b.style.fontSize='90px';a.append(b);let degrees=0;const row=element('div',undefined,'actions');a.append(row);addButton(row,'Spin! ✨',()=>{degrees+=1080+Math.floor(Math.random()*360);b.style.transform='rotate('+degrees+'deg)';status('Follow the bottle’s direction!')})}
+function memory(){const a=area(),icons=['💗','🎀','🌈','🍕','🐼','⭐','🎮','🌻'],deck=[...icons,...icons].map((v,i)=>({v,id:i,found:false})).sort(()=>Math.random()-.5);let first=null,locked=false,moves=0,found=0;const grid=element('div',undefined,'memory');a.append(grid);function draw(){grid.replaceChildren();deck.forEach((c,i)=>{const b=addButton(grid,c.found||i===first||c.open?c.v:'❔',()=>{if(locked||c.found||c.open||i===first)return;if(first===null){first=i;draw();return}moves++;if(deck[first].v===c.v){deck[first].found=c.found=true;first=null;found++;status(found===8?'All matched! 🎉 Moves: '+moves:'Pairs: '+found+'/8 · Moves: '+moves);draw()}else{c.open=true;locked=true;draw();setTimeout(()=>{c.open=false;first=null;locked=false;if(mode==='local'&&gameName==='Memory Match')draw()},800)}},c.found?'found':'');b.disabled=c.found})}status('Find all 8 pairs!');draw()}
+function scramble(){const a=area();let i=0,score=0;const q=element('div','','big center'),input=element('input'),feedback=section(''),row=element('div',undefined,'actions');input.placeholder='Type the original word';a.append(q,input,feedback,row);function draw(){const word=words[i];let shuffled=word;for(let n=0;n<8&&shuffled===word;n++)shuffled=word.split('').sort(()=>Math.random()-.5).join('');q.textContent=shuffled;input.value='';feedback.textContent='';status('Word '+(i+1)+' / '+words.length+' · Score '+score)}addButton(row,'Check',()=>{if(input.value.trim().toUpperCase()===words[i]){score++;feedback.textContent='Correct! 🎉'}else feedback.textContent='Answer: '+words[i];status('Score: '+score)});addButton(row,'Next →',()=>{i=(i+1)%words.length;draw()},'secondary');draw()}
+function connectFour(){const a=area(),board=Array.from({length:6},()=>Array(7).fill(''));let turn='red',over=false;const grid=element('div',undefined,'board7');a.append(grid);function won(r,c){for(const [dr,dc] of [[0,1],[1,0],[1,1],[1,-1]]){let count=1;for(const sign of [-1,1]){let rr=r+dr*sign,cc=c+dc*sign;while(rr>=0&&rr<6&&cc>=0&&cc<7&&board[rr][cc]===turn){count++;rr+=dr*sign;cc+=dc*sign}}if(count>=4)return true}return false}function draw(){grid.replaceChildren();for(let r=0;r<6;r++)for(let c=0;c<7;c++){const b=addButton(grid,'',()=>{if(over)return;let rr=5;while(rr>=0&&board[rr][c])rr--;if(rr<0)return;board[rr][c]=turn;if(won(rr,c)){over=true;status((turn==='red'?'Red':'Yellow')+' wins! 🎉')}else if(board.every(row=>row.every(Boolean))){over=true;status('Draw!')}else{turn=turn==='red'?'yellow':'red';status((turn==='red'?'Red':'Yellow')+'’s turn')}draw()},board[r][c]);b.setAttribute('aria-label','Column '+(c+1)+', row '+(r+1))}}status('Red’s turn');draw()}
+async function boot(){try{if(!window.supabase)throw Error('Supabase library could not load. Check your internet.');db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const {data,error}=await db.auth.getUser();if(error&&!/session missing/i.test(error.message))throw error;user=data?.user||null;if(user)await load();else show('loginView')}catch(e){notice(e.message,'error');show(user?'identityView':'loginView')}}renderGames();boot();setInterval(()=>{if(user&&snapshot?.me&&!busy&&document.visibilityState==='visible')load().catch(()=>{})},20000);
+</script></body></html>
