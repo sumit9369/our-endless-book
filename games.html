@@ -6,44 +6,36 @@
   <title>Our Little Games ♡ | Piyaa & Babuchak</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <style>
-    :root { --ink:#493047; --pink:#b44978; --violet:#6750aa; --paper:#fffafc; --border:#e8dce7; }
+    :root { --ink:#493047; --pink:#b44978; --violet:#6750aa; --border:#e8dce7; }
     * { box-sizing:border-box; }
-    body { margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif; color:var(--ink);
-      background:linear-gradient(140deg,#fff0f6,#f1edff); min-height:100vh; }
-    main { max-width:900px; margin:auto; padding:20px 14px 70px; }
-    header { text-align:center; padding:24px 10px 16px; }
-    h1 { font-family:Georgia,serif; font-size:clamp(2.3rem,6vw,4rem); margin:0; }
-    h2 { font-family:Georgia,serif; margin:0 0 12px; }
-    .subtitle,.muted { color:#806d7d; }
-    .card { background:rgba(255,255,255,.92); border:1px solid var(--border); border-radius:22px;
-      padding:22px; box-shadow:0 12px 35px #5c355b10; margin:14px 0; }
+    body { margin:0; min-height:100vh; color:var(--ink); font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif; background:linear-gradient(140deg,#fff0f6,#f1edff); }
+    main { max-width:850px; margin:auto; padding:18px 14px 70px; }
+    header { text-align:center; padding:20px 0; }
+    h1,h2 { font-family:Georgia,serif; }
+    h1 { font-size:clamp(2.4rem,7vw,4rem); margin:0; }
+    h2 { margin:0 0 12px; }
+    .muted { color:#846f80; }
+    .card { background:#ffffffed; border:1px solid var(--border); border-radius:22px; padding:22px; margin:14px 0; box-shadow:0 12px 30px #4b21440d; }
     .hidden { display:none !important; }
-    label { display:block; font-weight:650; margin:12px 0 5px; }
-    input,textarea,select { width:100%; border:1px solid #d9c7d7; border-radius:12px; padding:12px;
-      font:inherit; background:white; color:var(--ink); }
-    textarea { min-height:95px; resize:vertical; }
-    button { border:0; border-radius:12px; padding:12px 17px; background:linear-gradient(115deg,var(--pink),var(--violet));
-      color:white; font:inherit; font-weight:700; cursor:pointer; }
-    button:disabled { opacity:.55; cursor:not-allowed; }
-    button.secondary { background:#f1eaf3; color:var(--ink); }
-    button.danger { background:#a63e56; }
-    .actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:15px; }
-    .actions > button { flex:1 1 150px; }
-    .pill { background:#f5e9f2; border-radius:999px; padding:6px 12px; display:inline-block; margin:4px; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(185px,1fr)); gap:10px; }
-    .game { text-align:left; min-height:88px; background:#fff8fd; border:1px solid #e5cfe2; color:var(--ink); }
-    .game.selected { outline:3px solid #bd78a4; }
-    .game small { display:block; font-weight:400; color:#866d80; }
-    .notice { padding:12px 15px; border-radius:12px; background:#fff3d9; margin:14px 0; }
-    .error { background:#ffe7e7; color:#85283b; }
-    .success { background:#e7f8ef; color:#256747; }
-    .choice { width:100%; margin:5px 0; text-align:left; background:#f7eaf4; color:var(--ink); border:1px solid #e5c8db; }
-    .choice.active { background:#d8b9e7; }
-    .row { display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; }
-    .score { font-weight:800; font-size:1.2rem; }
-    code { overflow-wrap:anywhere; }
-    #toast { position:fixed; left:50%; transform:translateX(-50%); bottom:20px; max-width:92vw;
-      padding:13px 17px; border-radius:12px; color:white; background:#47364d; z-index:10; display:none; }
+    label { display:block; font-weight:700; margin:12px 0 5px; }
+    input,select,textarea { display:block; width:100%; padding:12px; border:1px solid #d9c7d7; border-radius:12px; font:inherit; color:var(--ink); background:white; }
+    textarea { min-height:90px; resize:vertical; }
+    button { border:0; border-radius:12px; padding:12px 18px; font:inherit; font-weight:700; color:white; background:linear-gradient(110deg,var(--pink),var(--violet)); cursor:pointer; }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    button.secondary { color:var(--ink); background:#f1eaf3; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:15px; }
+    .actions button { flex:1; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:9px; }
+    .game { color:var(--ink); background:#fff6fb; border:1px solid #e4cfe1; text-align:left; min-height:65px; }
+    .game.active { outline:3px solid #bb79a5; }
+    .option { width:100%; margin:5px 0; color:var(--ink); background:#f5e9f3; text-align:left; border:1px solid #e6d3e2; }
+    .option.active { background:#ddc4ed; outline:2px solid var(--violet); }
+    .notice { background:#fff3da; padding:12px 15px; border-radius:12px; margin:12px 0; overflow-wrap:anywhere; }
+    .notice.error { background:#ffe5e5; color:#862b40; }
+    .notice.good { background:#e8f7ed; color:#246943; }
+    .row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+    .score { padding:12px; background:#f9f0fa; border-radius:12px; margin:8px 0; }
+    .history { border-top:1px solid var(--border); padding:12px 0; }
     @media(max-width:550px) { .card { padding:16px; } }
   </style>
 </head>
@@ -53,452 +45,284 @@
     <div>✦ A LITTLE WORLD FOR TWO ✦</div>
     <h1>Our Little Games ♡</h1>
     <p>Piyaa ❤️ &amp; Babuchak 😃</p>
-    <p class="subtitle">Two friends • Two hearts • One little world ♡</p>
+    <p class="muted">Two friends • Two hearts • One little world ♡</p>
   </header>
 
-  <div id="status" class="notice hidden" role="status"></div>
+  <div id="notice" class="notice hidden" role="status"></div>
 
-  <section id="loginScreen" class="card">
+  <section id="loginView" class="card">
     <h2>Our private little world 🔐</h2>
-    <p class="muted">Log in with your existing Supabase email and password.</p>
+    <p class="muted">Log in with your existing Supabase account.</p>
     <form id="loginForm">
       <label for="email">Email</label>
       <input id="email" type="email" autocomplete="username" required>
       <label for="password">Password</label>
       <input id="password" type="password" autocomplete="current-password" required>
-      <div class="actions"><button id="loginBtn" type="submit">Log in ♡</button></div>
+      <div class="actions"><button type="submit">Log in ♡</button></div>
     </form>
   </section>
 
-  <section id="lobbyScreen" class="hidden">
-    <div class="card">
-      <div class="row"><h2>Who's playing? 💌</h2><button id="logoutBtn" class="secondary">Log out</button></div>
-      <p id="accountEmail" class="muted"></p>
-      <label for="displayName">Your player name</label>
-      <select id="displayName">
-        <option value="Piyaa">Piyaa ❤️</option>
-        <option value="Babuchak">Babuchak 😃</option>
-      </select>
-      <p class="muted">Each person must use a different Supabase account and select a different name.</p>
-      <div class="actions"><button id="createBtn">Create a new room</button></div>
-      <label for="joinCode">Or join with room ID</label>
-      <input id="joinCode" placeholder="Paste the room ID from your friend" autocomplete="off">
-      <div class="actions"><button id="joinBtn" class="secondary">Join room</button></div>
-    </div>
+  <section id="identityView" class="card hidden">
+    <div class="row"><h2>Who's playing? 💌</h2><button class="secondary" id="logout1">Log out</button></div>
+    <p id="identityEmail" class="muted"></p>
+    <p>Choose your name once. Each name is permanently linked to one login account.</p>
+    <label for="playerName">Your name</label>
+    <select id="playerName">
+      <option value="Piyaa">Piyaa ❤️</option>
+      <option value="Babuchak">Babuchak 😃</option>
+    </select>
+    <div class="actions"><button id="claimBtn">Continue ♡</button></div>
   </section>
 
-  <section id="roomScreen" class="hidden">
+  <section id="dashboard" class="hidden">
     <div class="card">
-      <div class="row"><h2>Our game room 🏡</h2><button id="leaveBtn" class="secondary">Leave view</button></div>
-      <p>Share this room ID with your friend:</p>
-      <div class="row"><code id="roomCode"></code><button id="copyBtn" class="secondary">Copy ID</button></div>
-      <div id="roomState" class="notice"></div>
-      <div class="row">
-        <span id="playerOne" class="pill"></span><span id="playerTwo" class="pill"></span>
-      </div>
-      <div id="scores" class="row score"></div>
-      <p id="turnText"></p>
-      <div class="actions"><button id="refreshBtn" class="secondary">Refresh now</button></div>
-    </div>
-
-    <div class="card">
-      <h2>Choose our game ♡</h2>
-      <p class="muted">All 10 modes use the same question-and-answer turn system.</p>
-      <div id="gameGrid" class="grid"></div>
-    </div>
-
-    <div id="askCard" class="card hidden">
-      <h2>Your turn to ask ✍️</h2>
-      <p id="askHint" class="muted"></p>
-      <form id="questionForm">
-        <label for="questionText">Your tricky / cute question</label>
-        <textarea id="questionText" maxlength="1000" required placeholder="Write a question for your friend..."></textarea>
-        <label for="option1">Option A</label><input id="option1" maxlength="180" required>
-        <label for="option2">Option B</label><input id="option2" maxlength="180" required>
-        <label for="option3">Option C</label><input id="option3" maxlength="180" required>
-        <label for="option4">Option D</label><input id="option4" maxlength="180" required>
-        <label for="correctOption">Correct answer</label>
-        <select id="correctOption">
-          <option value="0">Option A</option><option value="1">Option B</option>
-          <option value="2">Option C</option><option value="3">Option D</option>
-        </select>
-        <div class="actions"><button id="saveQuestionBtn" type="submit">Save &amp; send question</button></div>
-      </form>
-    </div>
-
-    <div id="answerCard" class="card hidden">
-      <h2>Answer your friend's question 💭</h2>
-      <div id="questionHeading" class="muted"></div>
-      <h3 id="questionDisplay"></h3>
-      <div id="answerChoices"></div>
-      <div class="actions"><button id="submitAnswerBtn" disabled>Submit answer</button></div>
+      <div class="row"><h2 id="welcome">Welcome ♡</h2><button class="secondary" id="logout2">Log out</button></div>
+      <p class="muted">No rooms. No room IDs. Play whenever you want.</p>
+      <div id="scores"></div>
+      <div class="actions"><button class="secondary" id="refreshBtn">Refresh questions</button></div>
     </div>
 
     <div id="waitingCard" class="card hidden">
       <h2>Waiting for your friend 💌</h2>
       <p id="waitingText"></p>
     </div>
-    <div id="resultCard" class="card hidden"><h2>Last answer ✨</h2><p id="lastResult"></p></div>
+
+    <div id="askCard" class="card hidden">
+      <h2>Your turn to ask ✍️</h2>
+      <p class="muted">Choose a game mode. Write one question and four possible answers.</p>
+      <div class="grid" id="gameGrid"></div>
+      <form id="askForm">
+        <label for="question">Your tricky question</label>
+        <textarea id="question" maxlength="1000" required placeholder="Write your question here..."></textarea>
+        <label for="option0">Option A</label><input id="option0" maxlength="250" required>
+        <label for="option1">Option B</label><input id="option1" maxlength="250" required>
+        <label for="option2">Option C</label><input id="option2" maxlength="250" required>
+        <label for="option3">Option D</label><input id="option3" maxlength="250" required>
+        <label for="correct">Correct answer (hidden until answered)</label>
+        <select id="correct"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
+        <div class="actions"><button type="submit">Save question for my friend ♡</button></div>
+      </form>
+    </div>
+
+    <div id="answerCard" class="card hidden">
+      <h2>Question waiting for you 💌</h2>
+      <p id="questionGame" class="muted"></p>
+      <h3 id="questionText"></h3>
+      <div id="answerOptions"></div>
+      <div class="actions"><button id="answerBtn" disabled>Submit answer</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Previous questions 📖</h2>
+      <div id="history" class="muted">No completed questions yet.</div>
+    </div>
   </section>
 </main>
-<div id="toast" role="alert"></div>
-
 <script>
-"use strict";
+  'use strict';
 
-// Supabase is configured here ONCE. Players never see a connection form.
-const SUPABASE_URL = "https://hwqccyftcaoqcmxmhdal.supabase.co";
-const SUPABASE_KEY = "sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf";
+  // Your existing public Supabase project URL and publishable key.
+  // Do NOT add /rest/v1/ to the project URL.
+  const SUPABASE_URL = 'https://hwqccyftcaoqcmxmhdal.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_C2_98shKT_qdOI8CFjYPKg_g-FUhqZf';
 
-const GAME_MODES = [
-  ["quiz", "💗 Friendship Quiz"],
-  ["truth", "📖 Truth or Dare"],
-  ["this", "⚡ This or That"],
-  ["toe", "❌ Tic Tac Toe"],
-  ["rather", "🤔 Would You Rather"],
-  ["emoji", "🧩 Guess the Emoji"],
-  ["bottle", "🍾 Spin the Bottle"],
-  ["memory", "🗒️ Memory Match"],
-  ["scramble", "🔤 Word Scramble"],
-  ["connect", "🔴 Connect Four"]
-];
+  const GAMES = [
+    'Friendship Quiz', 'Truth or Dare', 'This or That', 'Tic Tac Toe',
+    'Would You Rather', 'Guess the Emoji', 'Spin the Bottle',
+    'Memory Match', 'Word Scramble', 'Connect Four'
+  ];
 
-const $ = (id) => document.getElementById(id);
-let db, user = null, room = null, questions = [], answers = [], scores = [];
-let chosenAnswer = null, activeQuestion = null, busy = false, refreshTimer = null;
-let gameMode = "quiz", lastSignature = "";
+  const $ = id => document.getElementById(id);
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let user = null;
+  let snapshot = null;
+  let selectedGame = GAMES[0];
+  let selectedAnswer = null;
+  let busy = false;
 
-function showScreen(name) {
-  ["loginScreen", "lobbyScreen", "roomScreen"].forEach(id => $(id).classList.toggle("hidden", id !== name));
-}
-function showNotice(message, error = false) {
-  const el = $("status");
-  el.textContent = message;
-  el.className = "notice" + (error ? " error" : "");
-}
-function clearNotice() { $("status").classList.add("hidden"); }
-function toast(message) {
-  $("toast").textContent = message;
-  $("toast").style.display = "block";
-  setTimeout(() => { $("toast").style.display = "none"; }, 4500);
-}
-function report(error) {
-  console.error(error);
-  showNotice(error?.message || String(error), true);
-}
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, ch =>
-    ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[ch]);
-}
-function formatName(id) {
-  if (!id) return "Waiting for player";
-  if (id === user?.id) return localStorage.getItem("little_games_name") || "You";
-  return "Your friend";
-}
-function otherPlayerId() {
-  if (!room) return null;
-  return room.player1_id === user.id ? room.player2_id : room.player1_id;
-}
-function currentQuestion() {
-  return questions.find(q => q.status !== "answered" && !answers.some(a => a.question_id === q.id)) || null;
-}
-function isMyTurn() { return room?.current_player_id === user?.id; }
-function getOptions(q) {
-  if (!q) return [];
-  const raw = q.options;
-  if (Array.isArray(raw)) return raw;
-  if (typeof raw === "string") {
-    try { const parsed = JSON.parse(raw); return Array.isArray(parsed) ? parsed : []; }
-    catch { return []; }
+  function show(view) {
+    ['loginView','identityView','dashboard'].forEach(id => $(id).classList.toggle('hidden',id !== view));
   }
-  return [];
-}
-function setBusy(value) {
-  busy = value;
-  ["loginBtn", "createBtn", "joinBtn", "saveQuestionBtn", "submitAnswerBtn"].forEach(id => {
-    $(id).disabled = value || (id === "submitAnswerBtn" && chosenAnswer === null);
-  });
-}
-async function checked(promise) {
-  const { data, error } = await promise;
-  if (error) throw error;
-  return data;
-}
-async function init() {
-  if (!window.supabase?.createClient) {
-    showNotice("Supabase library could not load. Check internet access and refresh.", true);
-    return;
+
+  function notice(message, type='') {
+    const el = $('notice');
+    el.textContent = message;
+    el.className = 'notice ' + type;
+    el.classList.remove('hidden');
   }
-  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  GAME_MODES.forEach(([key, title]) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "game";
-    btn.dataset.game = key;
-    btn.textContent = title;
-    btn.addEventListener("click", () => chooseGame(key));
-    $("gameGrid").append(btn);
-  });
-  try {
-    const { data, error } = await db.auth.getUser();
-    if (error && !/session missing/i.test(error.message)) throw error;
-    if (data?.user) {
-      user = data.user;
-      await restoreSession();
-    } else showScreen("loginScreen");
-  } catch (error) { report(error); showScreen("loginScreen"); }
-}
-async function restoreSession() {
-  $("accountEmail").textContent = "Signed in: " + (user.email || "Account");
-  $("displayName").value = localStorage.getItem("little_games_name") || "Piyaa";
-  const savedRoom = localStorage.getItem("little_games_room_" + user.id);
-  if (savedRoom) {
-    try {
-      const found = await checked(db.from("bestie_game_rooms").select("*").eq("id", savedRoom).maybeSingle());
-      if (found && (found.player1_id === user.id || found.player2_id === user.id)) {
-        room = found;
-        await enterRoom();
-        return;
-      }
-    } catch (error) { console.warn("Could not restore room", error); }
+
+  function clearNotice() { $('notice').classList.add('hidden'); }
+
+  function element(tag, text, className) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    if (className) node.className = className;
+    return node;
   }
-  showScreen("lobbyScreen");
-}
-async function login(event) {
-  event.preventDefault();
-  clearNotice();
-  setBusy(true);
-  try {
-    const data = await checked(db.auth.signInWithPassword({
-      email: $("email").value.trim(), password: $("password").value
-    }));
-    user = data.user;
-    $("password").value = "";
-    await restoreSession();
-  } catch (error) { report(error); }
-  finally { setBusy(false); }
-}
-async function logout() {
-  stopRefreshing();
-  try { await checked(db.auth.signOut()); }
-  catch (error) { report(error); return; }
-  room = null; user = null;
-  showScreen("loginScreen");
-}
-function saveName() { localStorage.setItem("little_games_name", $("displayName").value); }
-async function createRoom() {
-  clearNotice(); saveName(); setBusy(true);
-  try {
-    const created = await checked(db.from("bestie_game_rooms").insert({
-      player1_id: user.id,
-      current_player_id: user.id,
-      game_type: "quiz",
-      status: "waiting"
-    }).select("*").single());
-    room = created;
-    await enterRoom();
-    toast("Room created! Share the room ID with your friend.");
-  } catch (error) { report(error); }
-  finally { setBusy(false); }
-}
-async function joinRoom() {
-  clearNotice(); saveName(); setBusy(true);
-  try {
-    const code = $("joinCode").value.trim();
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(code))
-      throw new Error("Paste the complete room ID shared by your friend.");
-    const found = await checked(db.from("bestie_game_rooms").select("*").eq("id", code).single());
-    if (found.player1_id !== user.id && found.player2_id && found.player2_id !== user.id)
-      throw new Error("This room already has two players.");
-    if (found.player1_id === user.id || found.player2_id === user.id) {
-      room = found;
+
+  async function rpc(name, params={}) {
+    const { data, error } = await db.rpc(name, params);
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  async function load() {
+    snapshot = await rpc('bestie_async_snapshot');
+    if (!snapshot.me) {
+      $('identityEmail').textContent = 'Signed in: ' + user.email;
+      show('identityView');
     } else {
-      const updated = await checked(db.from("bestie_game_rooms")
-        .update({ player2_id: user.id, status: "playing" })
-        .eq("id", code).is("player2_id", null).select("*").single());
-      room = updated;
+      show('dashboard');
+      render();
     }
-    await enterRoom();
-  } catch (error) { report(error); }
-  finally { setBusy(false); }
-}
-async function enterRoom() {
-  localStorage.setItem("little_games_room_" + user.id, room.id);
-  $("roomCode").textContent = room.id;
-  showScreen("roomScreen");
-  await refreshRoom();
-  startRefreshing();
-}
-function stopRefreshing() {
-  if (refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = null;
-}
-function startRefreshing() {
-  stopRefreshing();
-  refreshTimer = setInterval(() => { if (!busy && room) refreshRoom().catch(report); }, 3000);
-}
-async function leaveRoom() {
-  stopRefreshing();
-  if (user) localStorage.removeItem("little_games_room_" + user.id);
-  room = null;
-  showScreen("lobbyScreen");
-}
-async function refreshRoom() {
-  if (!room || !user) return;
-  const roomId = room.id;
-  const [freshRoom, freshQuestions, freshScores] = await Promise.all([
-    checked(db.from("bestie_game_rooms").select("*").eq("id", roomId).single()),
-    checked(db.from("bestie_game_questions").select("*").eq("room_id", roomId).order("created_at", { ascending:false }).limit(100)),
-    checked(db.from("bestie_game_scores").select("*").eq("room_id", roomId))
-  ]);
-  if (!room || room.id !== roomId) return;
-  room = freshRoom;
-  questions = freshQuestions || [];
-  scores = freshScores || [];
-  const ids = questions.map(q => q.id);
-  answers = ids.length ? await checked(db.from("bestie_game_answers").select("*").in("question_id", ids)) : [];
-  gameMode = room.game_type || "quiz";
-  render();
-}
-function chooseGame(mode) {
-  if (!room || !user) return;
-  if (!isMyTurn()) { toast("Only the current questioner can choose the game."); return; }
-  if (currentQuestion()) { toast("Finish the current question first."); return; }
-  db.from("bestie_game_rooms").update({ game_type: mode }).eq("id", room.id)
-    .then(({ error }) => { if (error) report(error); else refreshRoom().catch(report); });
-}
-function render() {
-  if (!room || !user) return;
-  $("roomState").textContent = room.player2_id ? "Both players joined ✓" : "Waiting for your friend to join…";
-  $("playerOne").textContent = "Player 1: " + formatName(room.player1_id);
-  $("playerTwo").textContent = "Player 2: " + formatName(room.player2_id);
-  $("scores").textContent = scores.map(s =>
-    `${formatName(s.player_id)}: ${s.points ?? 0} points`
-  ).join("  •  ") || "Scores will appear after the first answer.";
-  $("turnText").textContent = isMyTurn() ? "Your turn to ask 💌" : "Your friend's turn to ask 💌";
-  document.querySelectorAll(".game").forEach(btn =>
-    btn.classList.toggle("selected", btn.dataset.game === gameMode));
-  const q = currentQuestion();
-  const ready = Boolean(room.player2_id);
-  $("askCard").classList.toggle("hidden", !ready || !!q || !isMyTurn());
-  $("answerCard").classList.toggle("hidden", !ready || !q || q.questioner_id === user.id);
-  $("waitingCard").classList.toggle("hidden", ready && (!q || q.questioner_id !== user.id));
-  $("waitingText").textContent = !ready ? "Share the room ID and wait for your friend." :
-    q ? "Your question is saved. Waiting for your friend's answer." : "Waiting for your friend to create a question.";
-  $("askHint").textContent = "Game: " + (GAME_MODES.find(g => g[0] === gameMode)?.[1] || gameMode);
-  if (q && q.questioner_id !== user.id) renderQuestion(q);
-  const lastQ = questions.find(item => answers.some(a => a.question_id === item.id));
-  const lastA = lastQ ? answers.find(a => a.question_id === lastQ.id) : null;
-  $("resultCard").classList.toggle("hidden", !lastA);
-  if (lastA) $("lastResult").textContent =
-    (lastA.is_correct === true ? "Correct answer! +10 points 🎉" :
-      lastA.is_correct === false ? "Wrong answer! −5 points 💭" : "Answer submitted.");
-}
-function renderQuestion(q) {
-  if (activeQuestion?.id !== q.id) { chosenAnswer = null; $("submitAnswerBtn").disabled = true; }
-  activeQuestion = q;
-  $("questionHeading").textContent = "From your friend • " + (GAME_MODES.find(g => g[0] === q.question_type)?.[1] || "Game");
-  $("questionDisplay").textContent = q.question_text || "";
-  const choices = $("answerChoices");
-  choices.replaceChildren();
-  getOptions(q).forEach((option, index) => {
-    const btn = document.createElement("button");
-    btn.className = "choice" + (chosenAnswer === index ? " active" : "");
-    btn.textContent = String.fromCharCode(65 + index) + ". " + option;
-    btn.addEventListener("click", () => {
-      chosenAnswer = index;
-      $("submitAnswerBtn").disabled = false;
-      choices.querySelectorAll("button").forEach((b,i) => b.classList.toggle("active", i === index));
+  }
+
+  async function execute(fn) {
+    if (busy) return;
+    busy = true;
+    try { clearNotice(); await fn(); }
+    catch (err) { notice(err.message || String(err), 'error'); }
+    finally { busy = false; }
+  }
+
+  function renderGames() {
+    const grid = $('gameGrid');
+    grid.replaceChildren();
+    GAMES.forEach(name => {
+      const btn = element('button', name, 'game' + (name === selectedGame ? ' active' : ''));
+      btn.type = 'button';
+      btn.onclick = () => { selectedGame = name; renderGames(); };
+      grid.append(btn);
     });
-    choices.append(btn);
-  });
-}
-async function saveQuestion(event) {
-  event.preventDefault();
-  clearNotice();
-  if (!room?.player2_id || !isMyTurn() || currentQuestion()) {
-    toast("Wait until it's your turn and the previous question is finished."); return;
   }
-  const opts = [1,2,3,4].map(n => $("option" + n).value.trim());
-  if (opts.some(x => !x)) { toast("Fill in all four options."); return; }
-  setBusy(true);
-  let newQuestion = null;
-  try {
-    const receiver = otherPlayerId();
-    newQuestion = await checked(db.from("bestie_game_questions").insert({
-      room_id: room.id, questioner_id: user.id, receiver_id: receiver,
-      question_type: gameMode, question_text: $("questionText").value.trim(),
-      options: opts, status: "pending"
-    }).select("*").single());
-    await checked(db.from("bestie_game_secrets").insert({
-      question_id: newQuestion.id, creator_id: user.id,
-      correct_answer: opts[Number($("correctOption").value)]
-    }));
-    $("questionForm").reset();
-    toast("Question sent to your friend!");
-    await refreshRoom();
-  } catch (error) {
-    report(error);
-    if (newQuestion) showNotice("Question was created but saving its answer failed. Check your Supabase permissions before creating another.", true);
-  } finally { setBusy(false); }
-}
-async function submitAnswer() {
-  clearNotice();
-  if (!room || !user || chosenAnswer === null) return;
-  const q = currentQuestion();
-  if (!q || q.questioner_id === user.id || q.receiver_id !== user.id) {
-    toast("You cannot answer this question."); return;
-  }
-  const options = getOptions(q);
-  const submitted = options[chosenAnswer];
-  if (submitted === undefined) return;
-  setBusy(true);
-  try {
-    // Note: browser-side score validation is not tamper-proof.
-    // Supabase RLS must restrict secret access and unauthorized writes.
-    const secret = await checked(db.from("bestie_game_secrets")
-      .select("correct_answer").eq("question_id", q.id).single());
-    const correct = submitted === secret.correct_answer;
-    await checked(db.from("bestie_game_answers").insert({
-      question_id: q.id, player_id: user.id,
-      answer_text: submitted, is_correct: correct, approved: true
-    }));
-    await checked(db.from("bestie_game_questions").update({ status:"answered" }).eq("id", q.id));
-    const oldScore = scores.find(s => s.player_id === user.id);
-    const newPoints = (oldScore?.points || 0) + (correct ? 10 : -5);
-    if (oldScore) {
-      await checked(db.from("bestie_game_scores").update({ points:newPoints })
-        .eq("room_id", room.id).eq("player_id", user.id));
-    } else {
-      await checked(db.from("bestie_game_scores").insert({
-        room_id: room.id, player_id: user.id, points:newPoints, wins:0
-      }));
-    }
-    await checked(db.from("bestie_game_rooms").update({
-      current_player_id: correct ? user.id : q.questioner_id
-    }).eq("id", room.id));
-    chosenAnswer = null;
-    toast(correct ? "Correct! +10 points. Your turn to ask!" : "Wrong! −5 points. Your friend asks again.");
-    await refreshRoom();
-  } catch (error) {
-    report(error);
-    showNotice("Answer could not be completed. Your Supabase RLS policies may need adjustment. Do not submit repeatedly until checked.", true);
-  } finally { setBusy(false); }
-}
 
-$("loginForm").addEventListener("submit", login);
-$("logoutBtn").addEventListener("click", logout);
-$("createBtn").addEventListener("click", createRoom);
-$("joinBtn").addEventListener("click", joinRoom);
-$("leaveBtn").addEventListener("click", leaveRoom);
-$("refreshBtn").addEventListener("click", () => refreshRoom().catch(report));
-$("questionForm").addEventListener("submit", saveQuestion);
-$("submitAnswerBtn").addEventListener("click", submitAnswer);
-$("copyBtn").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(room.id); toast("Room ID copied!"); }
-  catch { toast("Select and copy the room ID above."); }
-});
-window.addEventListener("load", init);
+  function render() {
+    const players = snapshot.players || [];
+    const me = players.find(p => p.id === user.id);
+    const asker = players.find(p => p.id === snapshot.asker_id);
+    const active = (snapshot.questions || []).find(q => q.id === snapshot.active_question_id);
+    $('welcome').textContent = 'Hello, ' + (me?.name || snapshot.me) + ' ♡';
+    const scores = $('scores');
+    scores.replaceChildren();
+    players.forEach(p => scores.append(element('div', p.name + ' — ' + p.points + ' points · ✓ ' + p.correct + ' · ✗ ' + p.wrong, 'score')));
+
+    const both = players.length === 2;
+    const canAsk = both && !active && snapshot.asker_id === user.id;
+    const canAnswer = both && active && active.creator_id !== user.id;
+    $('askCard').classList.toggle('hidden', !canAsk);
+    $('answerCard').classList.toggle('hidden', !canAnswer);
+    $('waitingCard').classList.toggle('hidden', canAsk || canAnswer);
+
+    if (!both) $('waitingText').textContent = 'Waiting for your friend to log in and choose their name for the first time.';
+    else if (active) $('waitingText').textContent = 'Your question is saved. Your friend can answer whenever they log in.';
+    else $('waitingText').textContent = 'Waiting for ' + (asker?.name || 'your friend') + ' to create the next question.';
+
+    if (canAsk) renderGames();
+    if (canAnswer) {
+      selectedAnswer = null;
+      $('answerBtn').disabled = true;
+      $('questionGame').textContent = active.game;
+      $('questionText').textContent = active.text;
+      const options = $('answerOptions');
+      options.replaceChildren();
+      (active.options || []).forEach((answer, index) => {
+        const btn = element('button', String.fromCharCode(65+index) + '. ' + answer, 'option');
+        btn.onclick = () => {
+          selectedAnswer = index;
+          options.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          $('answerBtn').disabled = false;
+        };
+        options.append(btn);
+      });
+    }
+
+    const history = $('history');
+    history.replaceChildren();
+    const completed = (snapshot.questions || []).filter(q => q.answered_at);
+    if (!completed.length) history.textContent = 'No completed questions yet.';
+    completed.forEach(q => {
+      const creator = players.find(p => p.id === q.creator_id)?.name || 'Friend';
+      const responder = players.find(p => p.id === q.answered_by)?.name || 'Friend';
+      const box = element('div', undefined, 'history');
+      box.append(element('strong', q.game + ' · ' + creator + ' asked'));
+      box.append(element('p', q.text));
+      box.append(element('p', responder + ' answered: ' + (q.options?.[q.answer_index] || '') + (q.is_correct ? ' ✅ +10' : ' ❌ -5')));
+      box.append(element('p', 'Correct answer: ' + (q.options?.[q.correct_index] || '')));
+      history.append(box);
+    });
+  }
+
+  $('loginForm').addEventListener('submit', event => {
+    event.preventDefault();
+    execute(async () => {
+      const {data,error} = await db.auth.signInWithPassword({
+        email:$('email').value.trim(), password:$('password').value
+      });
+      if (error) throw error;
+      user = data.user;
+      $('password').value = '';
+      await load();
+    });
+  });
+
+  $('claimBtn').onclick = () => execute(async () => {
+    await rpc('bestie_async_claim', {p_name:$('playerName').value});
+    await load();
+  });
+
+  async function logout() {
+    await db.auth.signOut();
+    user = null;
+    snapshot = null;
+    show('loginView');
+    clearNotice();
+  }
+  $('logout1').onclick = () => execute(logout);
+  $('logout2').onclick = () => execute(logout);
+  $('refreshBtn').onclick = () => execute(load);
+
+  $('askForm').addEventListener('submit', event => {
+    event.preventDefault();
+    execute(async () => {
+      const options = [0,1,2,3].map(i => $('option'+i).value.trim());
+      if (options.some(x => !x)) throw new Error('Fill in all four options.');
+      await rpc('bestie_async_ask', {
+        p_game:selectedGame,
+        p_question:$('question').value.trim(),
+        p_options:options,
+        p_correct:Number($('correct').value)
+      });
+      $('askForm').reset();
+      await load();
+      notice('Question saved! Your friend can answer later.', 'good');
+    });
+  });
+
+  $('answerBtn').onclick = () => execute(async () => {
+    if (selectedAnswer === null) throw new Error('Choose an answer first.');
+    const id = snapshot.active_question_id;
+    const result = await rpc('bestie_async_answer', {p_question_id:id,p_index:selectedAnswer});
+    await load();
+    notice(result.correct ? 'Correct! +10 points. Your turn to ask!' : 'Wrong answer. -5 points. Your friend asks again.', result.correct ? 'good' : 'error');
+  });
+
+  async function boot() {
+    try {
+      if (!window.supabase) throw new Error('Supabase library could not load. Check your internet connection.');
+      const {data,error} = await db.auth.getUser();
+      if (error && !/session missing/i.test(error.message)) throw error;
+      user = data?.user || null;
+      if (user) await load();
+      else show('loginView');
+    } catch(err) {
+      notice(err.message + ' — Run the new async-games SQL setup if you have not done so.', 'error');
+      show(user ? 'identityView' : 'loginView');
+    }
+  }
+  boot();
+  // Periodically refresh while the page is open. It also works when reopened later.
+  setInterval(() => { if (user && snapshot?.me && !busy && document.visibilityState === 'visible') load().catch(()=>{}); }, 20000);
 </script>
 </body>
 </html>
